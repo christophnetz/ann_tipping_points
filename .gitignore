@@ -30,3 +30,23 @@
 *.exe
 *.out
 *.app
+
+# VS config
+*.vcx*
+.Rproj.user
+*.vs
+Debug/
+
+# ANN lib
+*ann*
+
+# data
+*csv
+*zip
+*doc*
+
+# pycharm files - let them be
+*xml
+
+# r files
+.Rhistory
