@@ -45,6 +45,7 @@ Debug/
 *csv
 *zip
 *doc*
+data/
 
 # pycharm files - let them be
 *xml
