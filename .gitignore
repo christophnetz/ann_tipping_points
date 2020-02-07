@@ -39,7 +39,7 @@ Debug/
 *.sln
 
 # ANN lib
-ann.hpp
+*ann.h
 
 # data
 *csv
