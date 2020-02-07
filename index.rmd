@@ -1,0 +1,34 @@
+--- 
+knit: "bookdown::render_book"
+title: "Adaptive response mechanisms overcome evolutionary tipping points"
+author: "Pratik R Gupte"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+documentclass: book
+bibliography: [refs.bib]
+biblio-style: apalike
+link-citations: yes
+github-repo: pratikunterwegs/ann_tipping_points
+description: "Adaptive response mechansisms overcome evolutionary tipping points"
+---
+
+# Introduction
+
+This is the `bookdown` version of a project in preparation that extends [@botero2015] by substituting adaptive response mechanisms in place of genetic architecture.
+
+## Attribution
+
+Please contact the following before cloning or in case of interest in the project.
+
+- Pratik Gupte: p.r.gupte@rug.nl
+- Christoph Netz: c.f.g.netz@rug.nl
+- Franjo Weissing (PI): f.j.weissing@rug.nl
+
+## Data access
+
+The data used in this work are generated from the code provided. Some parts of the code are redacted while the work is in progress.
+
+## Data processing
+
+The data processing for this project is described in the following sections. Navigate through them using the links in the sidebar.
