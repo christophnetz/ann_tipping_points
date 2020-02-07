@@ -39,6 +39,10 @@ struct Individual {
 		auto output_t = ann_dev(inputs_t);
 		I_realized = I_baseline + output_t[0];
 	}
+
+	// get mismatch
+	inline void update_mismatch(const float E) { mismatch += abs(E - I_realized); }
+
 };
 
 
