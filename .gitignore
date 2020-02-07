@@ -36,9 +36,10 @@
 .Rproj.user
 *.vs
 Debug/
+*.sln
 
 # ANN lib
-ann.hpp
+*ann.h
 
 # data
 *csv
