@@ -38,7 +38,7 @@
 Debug/
 
 # ANN lib
-#*ann*
+ann.hpp
 
 # data
 *csv
