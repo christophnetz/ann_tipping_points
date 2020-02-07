@@ -14,6 +14,7 @@ using Ann = Network<float,
 	Layer< Neuron<3, activation::rtlu>, 1>  // one output phenotype value
 >;
 
+// individuals
 struct Individual {
 
 	Individual() : mismatch(0.f), ann_dev(0.f), ann_life(0.f) {};
