@@ -5,6 +5,7 @@
 #include <cmath>
 #include<numeric>
 #include <fstream>
+#include <string>
 
 #include "individual.h"
 
@@ -25,7 +26,7 @@ std::vector<Individual> reproduction(std::vector<Individual>& pop, float kd, flo
 
   float mean_fitness = accumulate(fitness.begin(), fitness.end(), 0.f) / static_cast<float>(fitness.size());
 
-  std::cout << mean_fitness << std::endl;
+  //std::cout << mean_fitness << std::endl;
 
   //Reproduction
   for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
@@ -82,8 +83,10 @@ int main() {
   const float B = 0.f;   //stochastic scaling constant, default value
 
   //R between 1 and 100000, P between 0 and 1
-  float R = 10.f;  //Environmental variation
-  float P = 1.f;   //predictability
+  std::vector<float> vecR = { 1.f, powf(10.f, 0.5f), 10.f, powf(10.f, 1.5f), 100.f, powf(10.f, 2.5f), 1000.f, powf(10.f, 3.5f), 10000.f, powf(10.f, 4.5f), 100000.f };
+  std::vector<float> vecP = { 0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f };
+  //float R = 10.f;  //Environmental variation
+  //float P = 1.f;   //predictability
   ///
   const auto& env_dist = std::uniform_real_distribution<float>(-1.f, 1.f); // not explicitly stated in botero 2015
   float E;
@@ -93,84 +96,102 @@ int main() {
   int tmax = 5;
 
 
-  std::vector<Individual> pop(5000); // population size: 5000
-  std::vector<Individual> tmp_pop;
 
-  //Initialization
-  E = 0.f;
-  if (1.f - P == 0.f) {
-    Cue = E;
-  }
-  else {
-    Cue = std::normal_distribution<float>(P * E, ((1.f - P) / 3.f))(rnd::reng);
-  }
+  for (int r = 0; r < vecR.size(); ++r) {
 
-  for (int i = 0; i < static_cast<int>(pop.size()); i++) {
-    pop[i].update_I_g(Cue);
-  }
+    float R = vecR[r];
+
+    for (int p = 0; p < vecP.size(); ++p) {
+
+      float P = vecP[p];
 
 
-  for (int g = 0; g < gmax; g++) {
 
-    std::cout << g <<"\t";
+      std::vector<Individual> pop(5000); // population size: 5000
+      std::vector<Individual> tmp_pop;
 
-
-    for (int t = 0; t < tmax; t++) {
-
-      //update environment
-      E = A * std::sinf((2.f * static_cast<float>(M_PI)* static_cast<float>(static_cast<float>(g)* tmax + t)) / (static_cast<float>(tmax)* R)) + B * env_dist(rnd::reng);
-
-      //calculate cue
+      //Initialization
+      E = 0.f;
       if (1.f - P == 0.f) {
         Cue = E;
       }
       else {
         Cue = std::normal_distribution<float>(P * E, ((1.f - P) / 3.f))(rnd::reng);
       }
-      /// Is Cue calculated once for the whole population, or per individual?
 
-      //individual update
+      for (int i = 0; i < static_cast<int>(pop.size()); i++) {
+        pop[i].update_I_g(Cue);
+      }
+
+
+      for (int g = 0; g < gmax; g++) {
+
+        //std::cout << g << "\t";
+
+
+        for (int t = 0; t < tmax; t++) {
+
+          //update environment
+          E = A * std::sinf((2.f * static_cast<float>(M_PI)* static_cast<float>(static_cast<float>(g)* tmax + t)) / (static_cast<float>(tmax)* R)) + B * env_dist(rnd::reng);
+
+          //calculate cue
+          if (1.f - P == 0.f) {
+            Cue = E;
+          }
+          else {
+            Cue = std::normal_distribution<float>(P * E, ((1.f - P) / 3.f))(rnd::reng);
+          }
+          /// Is Cue calculated once for the whole population, or per individual?
+
+          //individual update
+          for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
+
+            pop[i].update_I_t(Cue);         //Insulation
+            pop[i].update_mismatch(E);      //phenotypic mismatch
+
+          }
+
+        }
+
+        //Reproduction
+        tmp_pop = reproduction(pop, kd, ka, tau);
+
+        //Adjust pop size
+        adjust_popsize(tmp_pop, pop.size());
+
+
+        //Mutation
+        for (int i = 0; i < static_cast<int>(tmp_pop.size()); i++) {
+
+          tmp_pop[i].mutate(mrate, mmean, mshape);
+          tmp_pop[i].update_I_g(Cue);
+        }
+
+        std::swap(pop, tmp_pop);
+        tmp_pop.clear();
+      }
+
+
+      //    std::string filetype = ".png";
+
+      const std::string outfile = "data_logR" + std::to_string(log10f(R)).substr(0,3) + "_P" + std::to_string(P).substr(0,3) + ".txt";
+
+
+      std::ofstream ofs(outfile);
+
+      ofs << "ind" << "\t" << "h" << "\t" << "I01" << "\t" << "I02" << "\t" << "b1" << "\t" << "b2" << "\t" << "s" << "\t" << "a" << "\n";
+
       for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
 
-        pop[i].update_I_t(Cue);         //Insulation
-        pop[i].update_mismatch(E);      //phenotypic mismatch
+        ofs << i << "\t" << pop[i].h << "\t" << pop[i].I01 << "\t" << pop[i].I02 << "\t" << pop[i].b1 << "\t" << pop[i].b2 << "\t" << pop[i].s << "\t" << pop[i].a << "\n";
 
       }
 
+      ofs.close();
+
     }
 
-    //Reproduction
-    tmp_pop = reproduction(pop, kd, ka, tau);
-
-    //Adjust pop size
-    adjust_popsize(tmp_pop, pop.size());
-
-
-    //Mutation
-    for (int i = 0; i < static_cast<int>(tmp_pop.size()); i++) {
-
-      tmp_pop[i].mutate(mrate, mmean, mshape);
-      tmp_pop[i].update_I_g(Cue);
-    }
-
-    std::swap(pop, tmp_pop);
-    tmp_pop.clear();
   }
-
-
-  std::ofstream ofs("data.txt");
-
-  ofs << "ind" << "\t" << "h" << "\t" << "I01" << "\t" << "I02" << "\t" << "b1" << "\t" << "b2" << "\t" << "s" << "\t" << "a" << "\n";
-
-  for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
-
-    ofs << i << "\t" << pop[i].h << "\t" << pop[i].I01 << "\t" << pop[i].I02 << "\t" << pop[i].b1 << "\t" << pop[i].b2 << "\t" << pop[i].s << "\t" << pop[i].a << "\n";
-
-  }
-
-  ofs.close();
-
-
 
   return 0;
 }
