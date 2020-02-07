@@ -6,64 +6,19 @@
 
 struct Individual {
 
-  Individual() : h(1.f), mismatch(0.f) {
-  
-    const auto& dist1 = std::uniform_real_distribution<float>(0.f, 1.f);
-    const auto& dist2 = std::uniform_real_distribution<float>(-1.f, 1.f);
-    const auto& dist3 = std::uniform_real_distribution<float>(-2.f, 2.f);
-
-    s = dist1(rnd::reng);
-    a = dist1(rnd::reng);
-
-    I01 = dist2(rnd::reng);
-    I02 = dist2(rnd::reng);
-
-    b1 = dist3(rnd::reng);
-    b2 = dist3(rnd::reng);
-    
-
-  }
+  Individual();
 
 
-  void update_I_t(const float C) {
-    if (s > 0.5) {
-      if (a > 0) {
-        if (h_coin) {
-          I_realized = b1 * C + I01;
-        }
-        else {
-          I_realized = b2 * C + I02;
-        }
-      }
+  void update_I_t(const float C);
 
-    }
-  
-  }
-  void update_I_g(float C) {
-  
-    h_coin = std::bernoulli_distribution(h)(rnd::reng);
+  void update_I_g(float C); 
 
-    if (s > 0.5) {
-      if (h_coin) {
-        I_realized = b1 * C + I01;
-      }
-      else {
-        I_realized = b2 * C + I02;
-      }
+  inline void update_mismatch(const float E) { mismatch += abs(E - I_realized); }
 
-    }
-    else {
-      if (h_coin) {
-        I_realized = I01;
-      }
-      else {
-        I_realized = I02;
-      }
+  float calculate_fitness(float kd, float ka, float tau);
 
-    }
-  
-  }
 
+  void mutate(float mrate, float mmean, float mshape);
 
 
   //genes
@@ -77,6 +32,7 @@ struct Individual {
 
   //lifetime params
   bool h_coin;
+  int n;
   float I_realized;
   float mismatch;
 
