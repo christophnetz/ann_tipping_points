@@ -180,7 +180,7 @@ int main() {
             }
 
 
-            const std::string outfile = "data_ann_logR" + std::to_string(log10f(R)).substr(0,3) + "_P" + std::to_string(P).substr(0,3) + ".txt";
+            const std::string outfile = "data_ann_logR" + std::to_string(log10f(R)).substr(0, 3) + "_P" + std::to_string(P).substr(0, 3) + ".txt";
 
 
             std::ofstream ofs(outfile);
@@ -191,7 +191,7 @@ int main() {
 
                 std::vector<float> vec_resp = pop[i].get_reaction(vec_cues);
 
-                for(int j = 0; j < static_cast<int>(vec_cues.size()); j++){
+                for (int j = 0; j < static_cast<int>(vec_cues.size()); j++) {
 
                     ofs << i << "\t" << vec_cues[j] << "\t" << vec_resp[j] << "\n";
 
@@ -202,12 +202,12 @@ int main() {
             }
             ofs.close();
         }
-
+    }
 
 
 
         return 0;
-    }
+}
 
 
 
