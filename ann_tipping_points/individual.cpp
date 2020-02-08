@@ -21,7 +21,7 @@ void Individual::update_I_t(const float C) {
 float Individual::calculate_fitness(float kd, float ka, float tau) {
 
     float tot_mut_dist;
-    for (auto& w : pop2[a].ann_life) {
+    for (auto& w : ann_life) {
         tot_mut_dist += abs(w);
     }
 
@@ -42,7 +42,7 @@ float Individual::calculate_fitness(float kd, float ka, float tau) {
 }
 
 /// function reaction norm
-std::vector<float> get_reaction(const std::vector<float> vec_cues){
+std::vector<float> Individual::get_reaction(const std::vector<float> vec_cues){
     std::vector<float> vec_reaction;
 
     for(size_t i_cue = 0; i_cue < static_cast<size_t>(vec_cues.size()); i_cue++){
