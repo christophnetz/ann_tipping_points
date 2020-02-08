@@ -36,14 +36,16 @@
 .Rproj.user
 *.vs
 Debug/
+*.sln
 
 # ANN lib
-ann.hpp
+*ann.h
 
 # data
 *csv
 *zip
 *doc*
+data/
 
 # pycharm files - let them be
 *xml
