@@ -185,7 +185,7 @@ int main() {
 
             std::ofstream ofs(outfile);
 
-            ofs << "ind" << "\t" << "cue" << "resp" << "\n";
+            ofs << "ind,cue,resp" << "\n";
 
             for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
 
@@ -193,7 +193,7 @@ int main() {
 
                 for (int j = 0; j < static_cast<int>(vec_cues.size()); j++) {
 
-                    ofs << i << "\t" << vec_cues[j] << "\t" << vec_resp[j] << "\n";
+                    ofs << i << "," << vec_cues[j] << "," << vec_resp[j] << "\n";
 
                 }
 
