@@ -147,7 +147,11 @@ int main() {
 			//calculate cue
 					Cue = std::normal_distribution<float>(P * E, (1 - P) / 3)(rnd::reng);
 			/// Is Cue calculated once for the whole population, or per individual?
+					for (int i = 0; i < pop.size(); ++i) {
 
+						pop[i].update_I_g(Cue); // development cue
+
+					}
 			//individual update during lifetime
 					for (int i = 0; i < pop.size(); ++i) {
 
