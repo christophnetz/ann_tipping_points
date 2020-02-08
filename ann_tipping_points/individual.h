@@ -17,13 +17,12 @@ Layer< Neuron<3, activation::rtlu>, 1>  // one output phenotype value
 // individuals
 struct Individual {
 
-    Individual() : mismatch(0.f), ann_dev(0.f), ann_life(0.f) {};
+    Individual() : mismatch(0.f), ann_dev(0.f), ann_life(0.f), n(0.f) {};
 
     Ann ann_dev, ann_life;
 
     float I_baseline, I_realized;
-    float mismatch;
-
+    float mismatch, n;
     void update_I_g(const float C);
     void update_I_t(const float C);
     inline void update_mismatch(const float E) { mismatch += abs(E - I_realized); }
