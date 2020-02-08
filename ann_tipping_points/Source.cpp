@@ -177,8 +177,28 @@ int main() {
 
 			}
 
-			// get reaction norms from individuals
+			
+			const std::string outfile = "data_ann_logR" + std::to_string(log10f(R)).substr(0,3) + "_P" + std::to_string(P).substr(0,3) + ".txt";
+
+
+      std::ofstream ofs(outfile);
+
+      ofs << "ind" << "\t" << "cue" << "resp" << "\n";
+
+      for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
+
+      	std::vector<float> vec_resp = pop[i].get_reaction(vec_cues);
+
+      	for(int j = 0; j < static_cast<int>(vec_cues.size()); j++){
+	      	
+	      	ofs << i << "\t" << vec_cues[j] << "\t" << vec_resp[j] << "\n";
+			
+      	}
+
+        
+
 		}
+		ofs.close();
 	}
 
 
