@@ -124,7 +124,7 @@ int main() {
 
     // standard vector of cues
     std::vector<float> vec_cues;
-    for (float i = cue_min; i < cue_max; ++cue_inc)
+    for (float i = cue_min; i < cue_max; i+=cue_inc)
     {
         vec_cues.push_back(i);
     }
