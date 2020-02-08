@@ -25,6 +25,21 @@ float Cue;
 int gmax = 50000;
 int tmax = 5;
 
+//Mutation
+const float mrate = 0.001f;
+const float mmean = 0.f;
+const float mshape = 0.05f;
+
+//Costs
+const float kd = 0.02f;
+const float ka = 0.01f;
+const float tau = 0.25;
+//float q = 2.2;
+
+//R between 1 and 100000, P between 0 and 1
+std::vector<float> vecR = { 1.f, powf(10.f, 0.5f), 10.f, powf(10.f, 1.5f), 100.f, powf(10.f, 2.5f), 1000.f, powf(10.f, 3.5f), 10000.f, powf(10.f, 4.5f), 100000.f };
+std::vector<float> vecP = { 0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f };
+
 // mutation prob
 std::bernoulli_distribution mut_event(0.001); // mutation probability
 // mutation size
@@ -38,7 +53,7 @@ void reproduction()
 	float max = 0.f; float min = 0.f;
 	for (int a = 0; a < popsize; a++)
 	{
-		fitness_vec.push_back(1.0 / static_cast<double> (pop[a].mismatch));
+		fitness_vec.push_back(pop[a].calculate_fitness(kd, ka, tau));
 	}
 
 	// make temp pop vector, position and energy vectors
@@ -82,31 +97,73 @@ void reproduction()
 
 }
 
+// adjust pop size
+void adjust_popsize(std::vector<Individual>& tmp_pop, const int targetsize) {
+
+	while (static_cast<int>(tmp_pop.size()) < targetsize) {
+		int duplicate = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
+		tmp_pop.push_back(tmp_pop[duplicate]);
+	}
+
+	while (static_cast<int>(tmp_pop.size()) > targetsize) {
+		int remove = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
+		tmp_pop.erase(tmp_pop.begin() + remove);
+	}
+
+}
+
 // output reaction norm
 
 int main() {
-	// generations
-	for (int g = 0; g < gmax; g++) {
-		std::cout << "gen = " << g << "\n";
 
-		for (int t = 0; t < tmax; t++) {
+	for (int r = 0; r < vecR.size(); ++r) {
+
+		float R = vecR[r];
+
+		for (int p = 0; p < vecP.size(); ++p) {
+
+			float P = vecP[p];
+
+			//Initialization
+			E = 0.f;
+			if (1.f - P == 0.f) {
+				Cue = E;
+			}
+			else {
+				Cue = std::normal_distribution<float>(P * E, ((1.f - P) / 3.f))(rnd::reng);
+			}
+
+			for (int i = 0; i < static_cast<int>(pop.size()); i++) {
+				pop[i].update_I_g(Cue);
+			}
+
+	// generations
+			for (int g = 0; g < gmax; g++) 
+			{
+				std::cout << "gen = " << g << "\n";
+
+				for (int t = 0; t < tmax; t++) {
 			//update environment
-			E = A * std::sin((2 * M_PI * (g * tmax + t)) / (tmax * R)) + B * env_dist(rnd::reng);
+					E = A * std::sin((2 * M_PI * (g * tmax + t)) / (tmax * R)) + B * env_dist(rnd::reng);
 			//calculate cue
-			Cue = std::normal_distribution<float>(P * E, (1 - P) / 3)(rnd::reng);
+					Cue = std::normal_distribution<float>(P * E, (1 - P) / 3)(rnd::reng);
 			/// Is Cue calculated once for the whole population, or per individual?
 
 			//individual update during lifetime
-			for (int i = 0; i < pop.size(); ++i) {
+					for (int i = 0; i < pop.size(); ++i) {
 
-				pop[i].update_I_t(Cue);
-				pop[i].update_mismatch(E);
+						pop[i].update_I_t(Cue);
+						pop[i].update_mismatch(E);
+
+					}
+
+				}
+				reproduction();
 
 			}
 
+			// get reaction norms from individuals
 		}
-		reproduction();
-		
 	}
 
 
