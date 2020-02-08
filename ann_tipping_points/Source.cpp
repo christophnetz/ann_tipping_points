@@ -46,7 +46,7 @@ std::bernoulli_distribution mut_event(0.001); // mutation probability
 std::cauchy_distribution<double> m_shift(0.0, 0.01); // how much of mutation
 
 // reproduction
-void reproduction()
+void reproduction(std::vector<Individual> & pop, float kd, float ka, float tau)
 {
 	// make fitness vec
 	std::vector<double> fitness_vec;
