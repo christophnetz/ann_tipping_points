@@ -116,9 +116,16 @@ void adjust_popsize(std::vector<Individual>& tmp_pop, const int targetsize) {
 
 }
 
-// output reaction norm
+/// main function
 
 int main() {
+
+	// standard vector of cues
+	std::vector<float> vec_cues;
+	for (float i = cue_min; i < cue_max; ++cue_inc)
+	{
+		vec_cues.push_back(i);
+	}
 
 	for (int r = 0; r < vecR.size(); ++r) {
 
