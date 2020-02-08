@@ -20,7 +20,7 @@ void Individual::update_I_t(const float C) {
 /// function ann fitness 
 float Individual::calculate_fitness(float kd, float ka, float tau) {
 
-    float tot_mut_dist;
+    float tot_mut_dist = 0.f;
     for (auto& w : ann_life) {
         tot_mut_dist += abs(w);
     }
