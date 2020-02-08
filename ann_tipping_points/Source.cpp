@@ -53,50 +53,50 @@ std::cauchy_distribution<double> m_shift(0.0, 0.01); // how much of mutation
 // reproduction
 void reproduction(std::vector<Individual> & pop, float kd, float ka, float tau)
 {
-	// make fitness vec
-	std::vector<double> fitness_vec;
-	float max = 0.f; float min = 0.f;
-	for (int a = 0; a < popsize; a++)
-	{
-		fitness_vec.push_back(pop[a].calculate_fitness(kd, ka, tau));
-	}
+    // make fitness vec
+    std::vector<double> fitness_vec;
+    float max = 0.f; float min = 0.f;
+    for (int a = 0; a < popsize; a++)
+    {
+        fitness_vec.push_back(pop[a].calculate_fitness(kd, ka, tau));
+    }
 
-	// make temp pop vector, position and energy vectors
-	std::vector<Individual> tmp_pop(popsize);
+    // make temp pop vector, position and energy vectors
+    std::vector<Individual> tmp_pop(popsize);
 
-	// assign parents
-	for (int a = 0; a < popsize; a++) {
+    // assign parents
+    for (int a = 0; a < popsize; a++) {
 
-		std::discrete_distribution<> weighted_lottery(fitness_vec.begin(), fitness_vec.end());
-		int parent_id = weighted_lottery(rnd::reng);
+        std::discrete_distribution<> weighted_lottery(fitness_vec.begin(), fitness_vec.end());
+        int parent_id = weighted_lottery(rnd::reng);
 
-		// replicate ann_dev
-		tmp_pop[a].ann_dev = pop[parent_id].ann_dev;
-		tmp_pop[a].ann_life = pop[parent_id].ann_life;
+        // replicate ann_dev
+        tmp_pop[a].ann_dev = pop[parent_id].ann_dev;
+        tmp_pop[a].ann_life = pop[parent_id].ann_life;
 
-		// reset mismatch
-		tmp_pop[a].mismatch = 0.f;
+        // reset mismatch
+        tmp_pop[a].mismatch = 0.f;
 
-		// mutate ann_dev
-		for (auto& w : tmp_pop[a].ann_dev) {
-			// probabilistic mutation of ANN
-			if (mut_event(rnd::reng)) {
-				w += static_cast<float> (m_shift(rnd::reng));
-			}
-		}
+        // mutate ann_dev
+        for (auto& w : tmp_pop[a].ann_dev) {
+            // probabilistic mutation of ANN
+            if (mut_event(rnd::reng)) {
+                w += static_cast<float> (m_shift(rnd::reng));
+            }
+        }
 
-		// mutate ann_life
-		for (auto& w : tmp_pop[a].ann_life) {
-			// probabilistic mutation of ANN
-			if (mut_event(rnd::reng)) {
-				w += static_cast<float> (m_shift(rnd::reng));
-			}
-		}
+        // mutate ann_life
+        for (auto& w : tmp_pop[a].ann_life) {
+            // probabilistic mutation of ANN
+            if (mut_event(rnd::reng)) {
+                w += static_cast<float> (m_shift(rnd::reng));
+            }
+        }
 
-	}
+    }
 
-	//overwrite old pop
-	std::swap(pop, tmp_pop);
+    //overwrite old pop
+    std::swap(pop, tmp_pop);
     tmp_pop.clear();
 
 }
@@ -104,15 +104,15 @@ void reproduction(std::vector<Individual> & pop, float kd, float ka, float tau)
 // adjust pop size
 void adjust_popsize(std::vector<Individual>& tmp_pop, const int targetsize) {
 
-	while (static_cast<int>(tmp_pop.size()) < targetsize) {
-		int duplicate = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
-		tmp_pop.push_back(tmp_pop[duplicate]);
-	}
+    while (static_cast<int>(tmp_pop.size()) < targetsize) {
+        int duplicate = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
+        tmp_pop.push_back(tmp_pop[duplicate]);
+    }
 
-	while (static_cast<int>(tmp_pop.size()) > targetsize) {
-		int remove = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
-		tmp_pop.erase(tmp_pop.begin() + remove);
-	}
+    while (static_cast<int>(tmp_pop.size()) > targetsize) {
+        int remove = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
+        tmp_pop.erase(tmp_pop.begin() + remove);
+    }
 
 }
 
@@ -120,92 +120,92 @@ void adjust_popsize(std::vector<Individual>& tmp_pop, const int targetsize) {
 
 int main() {
 
-	// standard vector of cues
-	std::vector<float> vec_cues;
-	for (float i = cue_min; i < cue_max; ++cue_inc)
-	{
-		vec_cues.push_back(i);
-	}
+    // standard vector of cues
+    std::vector<float> vec_cues;
+    for (float i = cue_min; i < cue_max; ++cue_inc)
+    {
+        vec_cues.push_back(i);
+    }
 
-	for (int r = 0; r < vecR.size(); ++r) {
+    for (int r = 0; r < vecR.size(); ++r) {
 
-		float R = vecR[r];
+        float R = vecR[r];
 
-		for (int p = 0; p < vecP.size(); ++p) {
+        for (int p = 0; p < vecP.size(); ++p) {
 
-			float P = vecP[p];
+            float P = vecP[p];
 
-			//Initialization
-			E = 0.f;
-			if (1.f - P == 0.f) {
-				Cue = E;
-			}
-			else {
-				Cue = std::normal_distribution<float>(P * E, ((1.f - P) / 3.f))(rnd::reng);
-			}
+            //Initialization
+            E = 0.f;
+            if (1.f - P == 0.f) {
+                Cue = E;
+            }
+            else {
+                Cue = std::normal_distribution<float>(P * E, ((1.f - P) / 3.f))(rnd::reng);
+            }
 
-			for (int i = 0; i < static_cast<int>(pop.size()); i++) {
-				pop[i].update_I_g(Cue);
-			}
+            for (int i = 0; i < static_cast<int>(pop.size()); i++) {
+                pop[i].update_I_g(Cue);
+            }
 
-	// generations
-			for (int g = 0; g < gmax; g++) 
-			{
-				std::cout << "gen = " << g << "\n";
+            // generations
+            for (int g = 0; g < gmax; g++)
+            {
+                std::cout << "gen = " << g << "\n";
 
-				for (int t = 0; t < tmax; t++) {
-			//update environment
-					E = A * std::sin((2 * M_PI * (g * tmax + t)) / (tmax * R)) + B * env_dist(rnd::reng);
-			//calculate cue
-					Cue = std::normal_distribution<float>(P * E, (1 - P) / 3)(rnd::reng);
-			/// Is Cue calculated once for the whole population, or per individual?
-					for (int i = 0; i < pop.size(); ++i) {
+                for (int t = 0; t < tmax; t++) {
+                    //update environment
+                    E = A * std::sin((2 * M_PI * (g * tmax + t)) / (tmax * R)) + B * env_dist(rnd::reng);
+                    //calculate cue
+                    Cue = std::normal_distribution<float>(P * E, (1 - P) / 3)(rnd::reng);
+                    /// Is Cue calculated once for the whole population, or per individual?
+                    for (int i = 0; i < pop.size(); ++i) {
 
-						pop[i].update_I_g(Cue); // development cue
+                        pop[i].update_I_g(Cue); // development cue
 
-					}
-			//individual update during lifetime
-					for (int i = 0; i < pop.size(); ++i) {
+                    }
+                    //individual update during lifetime
+                    for (int i = 0; i < pop.size(); ++i) {
 
-						pop[i].update_I_t(Cue);
-						pop[i].update_mismatch(E);
+                        pop[i].update_I_t(Cue);
+                        pop[i].update_mismatch(E);
 
-					}
+                    }
 
-				}
-				reproduction(pop, kd, ka, tau);
+                }
+                reproduction(pop, kd, ka, tau);
 
-			}
-
-			
-			const std::string outfile = "data_ann_logR" + std::to_string(log10f(R)).substr(0,3) + "_P" + std::to_string(P).substr(0,3) + ".txt";
+            }
 
 
-      std::ofstream ofs(outfile);
+            const std::string outfile = "data_ann_logR" + std::to_string(log10f(R)).substr(0,3) + "_P" + std::to_string(P).substr(0,3) + ".txt";
 
-      ofs << "ind" << "\t" << "cue" << "resp" << "\n";
 
-      for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
+            std::ofstream ofs(outfile);
 
-      	std::vector<float> vec_resp = pop[i].get_reaction(vec_cues);
+            ofs << "ind" << "\t" << "cue" << "resp" << "\n";
 
-      	for(int j = 0; j < static_cast<int>(vec_cues.size()); j++){
-	      	
-	      	ofs << i << "\t" << vec_cues[j] << "\t" << vec_resp[j] << "\n";
-			
-      	}
+            for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
 
-        
+                std::vector<float> vec_resp = pop[i].get_reaction(vec_cues);
 
-		}
-		ofs.close();
-	}
+                for(int j = 0; j < static_cast<int>(vec_cues.size()); j++){
+
+                    ofs << i << "\t" << vec_cues[j] << "\t" << vec_resp[j] << "\n";
+
+                }
 
 
 
+            }
+            ofs.close();
+        }
 
-	return 0;
-}
+
+
+
+        return 0;
+    }
 
 
 
