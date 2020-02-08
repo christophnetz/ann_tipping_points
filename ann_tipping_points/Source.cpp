@@ -161,7 +161,7 @@ int main() {
 					}
 
 				}
-				reproduction();
+				reproduction(pop, kd, ka, tau);
 
 			}
 
