@@ -57,7 +57,7 @@ void reproduction(std::vector<Individual> & pop, float kd, float ka, float tau)
 	}
 
 	// make temp pop vector, position and energy vectors
-	std::vector<Individual> pop2(popsize);
+	std::vector<Individual> tmp_pop(popsize);
 
 	// assign parents
 	for (int a = 0; a < popsize; a++) {
@@ -66,16 +66,14 @@ void reproduction(std::vector<Individual> & pop, float kd, float ka, float tau)
 		int parent_id = weighted_lottery(rnd::reng);
 
 		// replicate ann_dev
-		pop2[a].ann_dev = pop[parent_id].ann_dev;
-		pop2[a].ann_life = pop[parent_id].ann_life;
+		tmp_pop[a].ann_dev = pop[parent_id].ann_dev;
+		tmp_pop[a].ann_life = pop[parent_id].ann_life;
 
 		// reset mismatch
-		pop2[a].mismatch = 0.f;
-		// process a baseline -- this is development
-		pop2[a].update_I_g(Cue);
+		tmp_pop[a].mismatch = 0.f;
 
 		// mutate ann_dev
-		for (auto& w : pop2[a].ann_dev) {
+		for (auto& w : tmp_pop[a].ann_dev) {
 			// probabilistic mutation of ANN
 			if (mut_event(rnd::reng)) {
 				w += static_cast<float> (m_shift(rnd::reng));
@@ -83,7 +81,7 @@ void reproduction(std::vector<Individual> & pop, float kd, float ka, float tau)
 		}
 
 		// mutate ann_life
-		for (auto& w : pop2[a].ann_life) {
+		for (auto& w : tmp_pop[a].ann_life) {
 			// probabilistic mutation of ANN
 			if (mut_event(rnd::reng)) {
 				w += static_cast<float> (m_shift(rnd::reng));
@@ -93,7 +91,8 @@ void reproduction(std::vector<Individual> & pop, float kd, float ka, float tau)
 	}
 
 	//overwrite old pop
-	pop = pop2;
+	std::swap(pop, tmp_pop);
+    tmp_pop.clear();
 
 }
 
