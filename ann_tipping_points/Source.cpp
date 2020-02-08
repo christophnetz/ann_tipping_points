@@ -36,6 +36,11 @@ const float ka = 0.01f;
 const float tau = 0.25;
 //float q = 2.2;
 
+//Cue range for reaction norm
+const float cue_max = 1.f;
+const float cue_min = 0.f;
+const float cue_inc = 0.05f;
+
 //R between 1 and 100000, P between 0 and 1
 std::vector<float> vecR = { 1.f, powf(10.f, 0.5f), 10.f, powf(10.f, 1.5f), 100.f, powf(10.f, 2.5f), 1000.f, powf(10.f, 3.5f), 10000.f, powf(10.f, 4.5f), 100000.f };
 std::vector<float> vecP = { 0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f };
