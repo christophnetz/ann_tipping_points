@@ -3,7 +3,9 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
-
+#include <numeric>
+#include <fstream>
+#include <string>
 #include "individual.h"
 
 const int popsize = 5000;
