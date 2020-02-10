@@ -49,7 +49,7 @@ std::vector<float> Individual::get_reaction(const std::vector<float> vec_cues){
         // get ann output
         Ann::input_t inputs_t;
         inputs_t[0] = vec_cues[i_cue];
-        auto output_t = ann_dev(inputs_t);
+        auto output_t = ann_life(inputs_t);
         I_realized = I_baseline + output_t[0];
 
         vec_reaction.push_back(I_realized);
