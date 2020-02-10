@@ -34,8 +34,8 @@ float Individual::calculate_fitness(float kd, float ka, float tau) {
     }
     mismatch = 0.f;
 
-    if (fit < 0.f)
-        fit = 0.f;
+    if (fit <= 0.f)
+        fit = 0.0000001f;
 
     return fit;
 
