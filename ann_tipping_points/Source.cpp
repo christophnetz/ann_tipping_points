@@ -79,6 +79,9 @@ void reproduction(std::vector<Individual> & pop, float kd, float ka, float tau)
         // reset mismatch
         tmp_pop[a].mismatch = 0.f;
 
+        // get dev cue
+        tmp_pop[a].update_I_g(Cue);
+
         // mutate ann_dev
         for (auto& w : tmp_pop[a].ann_dev) {
             // probabilistic mutation of ANN
@@ -136,6 +139,8 @@ int main() {
         for (int p = 0; p < vecP.size(); ++p) {
 
             float P = vecP[p];
+            // re init agents
+            std::vector<Individual> pop(popsize);
 
             //Initialization
             E = 0.f;
@@ -150,22 +155,28 @@ int main() {
                 pop[i].update_I_g(Cue);
             }
 
+            // print info
+            std::cout << "R = " << R << " P = " << P << "\n";
             // generations
             for (int g = 0; g < gmax; g++)
             {
-                std::cout << "gen = " << g << "\n";
+                // print gens
+                if (g % 100 == 0) {
+                    std::cout << "gen = " << g << "\n";
+                }
 
                 for (int t = 0; t < tmax; t++) {
                     //update environment
-                    E = A * std::sin((2 * M_PI * (g * tmax + t)) / (tmax * R)) + B * env_dist(rnd::reng);
+                    E = A * std::sinf((2 * static_cast<float>(M_PI) * (static_cast<float>(g) * static_cast<float>(tmax) + 
+                        static_cast<float>(t))) / (static_cast<float>(tmax) * R)) + B * env_dist(rnd::reng);
                     //calculate cue
-                    Cue = std::normal_distribution<float>(P * E, (1 - P) / 3)(rnd::reng);
-                    /// Is Cue calculated once for the whole population, or per individual?
-                    for (int i = 0; i < pop.size(); ++i) {
-
-                        pop[i].update_I_g(Cue); // development cue
-
+                    if (1.f - P == 0.f) {
+                        Cue = E;
                     }
+                    else {
+                        Cue = std::normal_distribution<float>(P * E, ((1.f - P) / 3.f))(rnd::reng);
+                    }
+                    
                     //individual update during lifetime
                     for (int i = 0; i < pop.size(); ++i) {
 
@@ -180,7 +191,7 @@ int main() {
             }
 
 
-            const std::string outfile = "data_ann_logR" + std::to_string(log10f(R)).substr(0, 3) + "_P" + std::to_string(P).substr(0, 3) + ".txt";
+            const std::string outfile = "data/data_ann_logR" + std::to_string(log10f(R)).substr(0, 3) + "_P" + std::to_string(P).substr(0, 3) + ".txt";
 
 
             std::ofstream ofs(outfile);
