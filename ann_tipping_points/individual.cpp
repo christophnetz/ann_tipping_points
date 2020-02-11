@@ -1,5 +1,18 @@
 #include "individual.h"
 
+/// uniform dist of node weights
+std::uniform_real_distribution<float> node_wt_picker(-1.f, 1.f);
+
+/// construct indivs
+Individual::Individual() {
+    mismatch = 0.f; 
+    ann_dev(node_wt_picker(rnd::reng)); 
+    ann_life(node_wt_picker(rnd::reng));
+    n = 0.f;
+    I_baseline = 0.f;
+    I_realized = 0.f;
+};
+
 /// function development cue
 void Individual::update_I_g(const float C) {
     Ann::input_t inputs_g;
@@ -20,7 +33,7 @@ void Individual::update_I_t(const float C) {
 /// function ann fitness 
 float Individual::calculate_fitness(float kd, float ka, float tau) {
 
-    float tot_mut_dist = 0.f;
+    /*float tot_mut_dist = 0.f;
     for (auto& w : ann_life) {
         tot_mut_dist += abs(w);
     }
@@ -34,6 +47,11 @@ float Individual::calculate_fitness(float kd, float ka, float tau) {
     }
     mismatch = 0.f;
 
+    if (fit <= 0.f)
+        fit = 0.0000001f;
+
+    return fit;*/
+    float fit = 1.f / mismatch;
     if (fit <= 0.f)
         fit = 0.0000001f;
 
