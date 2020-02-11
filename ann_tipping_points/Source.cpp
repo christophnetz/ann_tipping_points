@@ -8,7 +8,7 @@
 #include <string>
 #include "individual.h"
 
-const int popsize = 200;
+const int popsize = 5000;
 //Varied Parameters
 // A and B were varied between 0 and 1 (A+B = 1) to investigate deterministic vs stochastic env., not found to have a great effect 
 
@@ -56,19 +56,18 @@ void reproduction(std::vector<Individual> & pop, float kd, float ka, float tau)
 {
     // make fitness vec
     std::vector<double> fitness_vec;
-    float max = 0.f; float min = 0.f;
     for (int a = 0; a < popsize; a++)
     {
-        fitness_vec.push_back(pop[a].calculate_fitness(kd, ka, tau));
+        fitness_vec.push_back(pop[a].calculate_fitness());
     }
 
     // make temp pop vector, position and energy vectors
     std::vector<Individual> tmp_pop(popsize);
+    std::discrete_distribution<> weighted_lottery(fitness_vec.begin(), fitness_vec.end());
 
     // assign parents
     for (int a = 0; a < popsize; a++) {
 
-        std::discrete_distribution<> weighted_lottery(fitness_vec.begin(), fitness_vec.end());
         int parent_id = weighted_lottery(rnd::reng);
 
         // replicate ann_dev
@@ -162,7 +161,7 @@ int main() {
             for (int g = 0; g < gmax; g++)
             {
                 // print gens
-                if (g % 500 == 0) {
+                if (g % 1 == 0) {
                     std::cout << "gen = " << g << "\n";
                 }
 
