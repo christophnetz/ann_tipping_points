@@ -8,8 +8,7 @@
 #include <string>
 #include "individual.h"
 
-const int popsize = 5000;
-std::vector<Individual> pop(5000); // population size: 5000
+const int popsize = 200;
 //Varied Parameters
 // A and B were varied between 0 and 1 (A+B = 1) to investigate deterministic vs stochastic env., not found to have a great effect 
 
@@ -125,6 +124,8 @@ void adjust_popsize(std::vector<Individual>& tmp_pop, const int targetsize) {
 
 int main() {
 
+    // float someval = std::normal_distribution<float>(0.f, 0.00000001f)(rnd::reng);
+
     // standard vector of cues
     std::vector<float> vec_cues;
     for (float i = cue_min; i < cue_max; i+=cue_inc)
@@ -161,7 +162,7 @@ int main() {
             for (int g = 0; g < gmax; g++)
             {
                 // print gens
-                if (g % 100 == 0) {
+                if (g % 500 == 0) {
                     std::cout << "gen = " << g << "\n";
                 }
 
