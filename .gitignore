@@ -39,6 +39,7 @@ Debug/
 *.sln
 
 # ANN lib
+*ann2.hpp
 *ann.h
 
 # data
@@ -46,6 +47,7 @@ Debug/
 *zip
 *doc*
 data/
+figures/*
 
 # pycharm files - let them be
 *xml
