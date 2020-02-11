@@ -3,22 +3,19 @@
 
 #include <random>
 #include "rnd.hpp"
-#include "ann.h"
+#include "ann2.hpp"
 
 using namespace ann;
 
 // specify ann structure
 using Ann = Network<float,
-Layer< Neuron<1, activation::rtlu>, 3>, // for now, 1 input for env cues
-Layer< Neuron<3, activation::rtlu>, 3>,
-Layer< Neuron<3, activation::rtlu>, 1>  // one output phenotype value
+Layer< Neuron<1, activation::tanh::bipolar>, 3>, // for now, 1 input for env cues
+Layer< Neuron<3, activation::tanh::bipolar>, 1>  // one output phenotype value
 >;
 
 // individuals
 struct Individual {
-
-    Individual() : mismatch(0.f), ann_dev(0.f), ann_life(0.f), n(0.f), I_baseline(0.f),
-    I_realized(0.f) {};
+    Individual();
 
     Ann ann_dev, ann_life;
 
