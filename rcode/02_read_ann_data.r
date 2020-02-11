@@ -35,4 +35,6 @@ data <- unnest(data, cols = agents)
 # plot by combo
 ggplot(data)+
   geom_path(aes(x = cue, y = resp, group = ind), col = "red")+
-  facet_grid(R~P, labeller = label_both)
+  facet_grid(R~P, labeller = label_both)+
+  coord_cartesian(ylim = c(-1,1))
+ 

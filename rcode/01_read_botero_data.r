@@ -14,7 +14,7 @@ library(viridis)
 
 #### load data ####
 # list data files
-data_files <- list.files("data/", full.names = TRUE)
+data_files <- list.files("data/botero/", full.names = TRUE)
 
 # get params from filename
 parameters <- str_extract_all(data_files, regex("[0-9].[0-9]")) %>% 
@@ -34,7 +34,7 @@ process_cue <- function(h, I01, I02, b1, b2, s, a){
   
   # work through parameters getting slope and intercept
   if(s <= 0.5){
-    if(h <= 1){
+    if(h < 1){
       # name strategy
       data_rnorm <- data.table(intercept = c(I01*h, I02*(1-h)),
                                slope = 0, strategy = c("dbh1", "dbh2"))
@@ -43,7 +43,7 @@ process_cue <- function(h, I01, I02, b1, b2, s, a){
       data_rnorm <- data.table(intercept = I01, slope = 0, strategy = "cbh")
     }
   }else{
-    if(h <= 1){
+    if(h < 1){
       # name strategy
       data_rnorm <- data.table(intercept = I02, slope = b2,
                                strategy = ifelse(a < 0, "dev_plast", "fen_plast"))
@@ -69,9 +69,9 @@ data <- select(data, -agents) %>%
 
 # plot figure
 ggplot(data)+
-  geom_abline(aes(intercept = intercept, slope = slope, col = strategy))+
+  geom_abline(aes(intercept = intercept, slope = slope))+
   scale_x_continuous(limits = c(0,1))+
   scale_y_continuous(limits = c(0,1))+
-  coord_cartesian(xlim=c(0,1), ylim=c(0, 1))+
-  facet_grid(R~P, labeller = label_both)+
+  coord_cartesian(xlim=c(-1,1), ylim=c(-1, 1))+
+  facet_grid(P~R, labeller = label_both)+
   theme_bw()
