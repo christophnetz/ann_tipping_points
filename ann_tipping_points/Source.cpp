@@ -32,7 +32,7 @@ const float B = 0.f;   //stochastic scaling constant, default value
 const auto& env_dist = std::uniform_real_distribution<float>(-1.f, 1.f); // not explicitly stated in botero 2015
 
 
-std::vector<Individual> reproduction(std::vector<Individual>& pop) {
+std::vector<Individual> reproduction(std::vector<Individual>& pop, float& mean_fitness) {
 
   //Calculate fitness
   std::vector<float> fitness;
@@ -45,7 +45,7 @@ std::vector<Individual> reproduction(std::vector<Individual>& pop) {
 
   }
 
-  float mean_fitness = accumulate(fitness.begin(), fitness.end(), 0.f) / static_cast<float>(fitness.size());
+  mean_fitness = accumulate(fitness.begin(), fitness.end(), 0.f) / static_cast<float>(fitness.size());
 
   //std::cout << mean_fitness << std::endl;
 
@@ -117,11 +117,12 @@ void adjust_popsize(std::vector<Individual>& tmp_pop, const int targetsize) {
 
 }
 
-void simulation1(std::vector<Individual>& pop, const float& P, const float& R) {
+float simulation1(std::vector<Individual>& pop, const float& P, const float& R) {
 
   std::vector<Individual> tmp_pop;
   float E;
   float Cue;
+  float fitnessM = 0.f;
   //Initialization
   E = 0.f;
   if (1.f - P == 0.f) {
@@ -166,7 +167,7 @@ void simulation1(std::vector<Individual>& pop, const float& P, const float& R) {
     }
 
     //Reproduction
-    tmp_pop = reproduction(pop);
+    tmp_pop = reproduction(pop, fitnessM);
 
     //Adjust pop size
     adjust_popsize(tmp_pop, pop.size());
@@ -183,7 +184,7 @@ void simulation1(std::vector<Individual>& pop, const float& P, const float& R) {
     tmp_pop.clear();
   }
 
-
+  return fitnessM;
 }
 
 void simulation2(const float& P, const float& R, const float& Rold, std::vector<Individual> pop, int& extinction) {
@@ -275,9 +276,9 @@ int main() {
 
 
 
-  const std::string outfile2 = "extinction_data.txt";
+  const std::string outfile2 = "fitnessmeans.txt";
   std::ofstream ofs2(outfile2);
-  ofs2 << "Pold" << "\t" << "Pnew" << "\t" << "Rold" << "\t" << "Rnew" << "\t" << "extinction" << "\n";
+  ofs2 << "P" << "\t" << "R" << "\t" << "fitnessM" << "\n";
 
 
 
@@ -294,7 +295,7 @@ int main() {
 
       std::vector<Individual> pop(popsize); // population size: 5000
 
-      simulation1(pop, P, R);
+      float fitnessM = simulation1(pop, P, R);
 
       //    std::string filetype = ".png";
 
@@ -313,6 +314,8 @@ int main() {
 
       ofs.close();
 
+      ofs2 << P << "\t" << R << "\t" << fitnessM << "\n";
+
 
       ///////////////////////////////////////////////////////
       ///Transition
@@ -320,29 +323,29 @@ int main() {
       //What's this relative extinction rate?
 
 
-      std::vector<int> extinction = { 0,0,0,0,0 };
-      if (p > 0) {
-        simulation2(vecP[p - 1], R, R, pop, extinction[0]);
-        ofs2 << P << "\t" << vecP[p - 1] << "\t" << R << "\t" << R << "\t" << extinction[0] << "\n";
-      }
-      if (p < vecP.size() - 1) {
-        simulation2(vecP[p + 1], R, R, pop, extinction[1]);
-        ofs2 << P << "\t" << vecP[p + 1] << "\t" << R << "\t" << R << "\t" << extinction[1] << "\n";
+      //std::vector<int> extinction = { 0,0,0,0,0 };
+      //if (p > 0) {
+      //  simulation2(vecP[p - 1], R, R, pop, extinction[0]);
+      //  ofs2 << P << "\t" << vecP[p - 1] << "\t" << R << "\t" << R << "\t" << extinction[0] << "\n";
+      //}
+      //if (p < vecP.size() - 1) {
+      //  simulation2(vecP[p + 1], R, R, pop, extinction[1]);
+      //  ofs2 << P << "\t" << vecP[p + 1] << "\t" << R << "\t" << R << "\t" << extinction[1] << "\n";
 
-      }
-      if (r > 0) {
-        simulation2(P, vecR[r - 1], R, pop, extinction[2]);
-        ofs2 << P << "\t" << P << "\t" << R << "\t" << vecR[r - 1] << "\t" << extinction[2] << "\n";
+      //}
+      //if (r > 0) {
+      //  simulation2(P, vecR[r - 1], R, pop, extinction[2]);
+      //  ofs2 << P << "\t" << P << "\t" << R << "\t" << vecR[r - 1] << "\t" << extinction[2] << "\n";
 
-      }
-      if (r < vecR.size() - 1) {
-        simulation2(P, vecR[r + 1], R, pop, extinction[3]);
-        ofs2 << P << "\t" << P << "\t" << R << "\t" << vecR[r + 1] << "\t" << extinction[3] << "\n";
+      //}
+      //if (r < vecR.size() - 1) {
+      //  simulation2(P, vecR[r + 1], R, pop, extinction[3]);
+      //  ofs2 << P << "\t" << P << "\t" << R << "\t" << vecR[r + 1] << "\t" << extinction[3] << "\n";
 
-      }
+      //}
 
-      simulation2(P, R, R, pop, extinction[4]);
-      ofs2 << P << "\t" << P << "\t" << R << "\t" << R << "\t" << extinction[4] << "\n";
+      //simulation2(P, R, R, pop, extinction[4]);
+      //ofs2 << P << "\t" << P << "\t" << R << "\t" << R << "\t" << extinction[4] << "\n";
 
 
 
