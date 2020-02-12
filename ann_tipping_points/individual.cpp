@@ -59,6 +59,25 @@ float Individual::calculate_fitness() {
 
 }
 
+/// function mutation
+void Individual::mutate(){
+    // mutate ann_dev
+    for (auto& w : ann_dev) {
+            // probabilistic mutation of ANN
+        if (mut_event(rnd::reng)) {
+            w += static_cast<float> (m_shift(rnd::reng));
+        }
+    }
+
+    // mutate ann_life
+    for (auto& w : ann_life) {
+            // probabilistic mutation of ANN
+        if (mut_event(rnd::reng)) {
+            w += static_cast<float> (m_shift(rnd::reng));
+        }
+    }
+}
+
 /// function reaction norm
 std::vector<float> Individual::get_reaction(const std::vector<float> vec_cues){
     std::vector<float> vec_reaction;
