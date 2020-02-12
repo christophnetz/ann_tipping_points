@@ -55,57 +55,43 @@ std::bernoulli_distribution mut_event(0.001); // mutation probability
 // mutation size
 std::cauchy_distribution<double> m_shift(0.0, 0.01); // how much of mutation
 
-// reproduction
-void reproduction(std::vector<Individual>& pop, float kd, float ka, float tau)
-{
-	// make fitness vec
-	std::vector<double> fitness_vec;
-	for (int a = 0; a < popsize; a++)
-	{
-		fitness_vec.push_back(pop[a].calculate_fitness());
-	}
+/// reproduction with fixed pop size
+void reproduction(std::vector<Individual>& pop, float kd, float ka, float tau) {
 
-	// make temp pop vector, position and energy vectors
-	std::vector<Individual> tmp_pop(popsize);
-	std::discrete_distribution<> weighted_lottery(fitness_vec.begin(), fitness_vec.end());
+  //Calculate fitness
+  std::vector<float> fitness;
+  std::vector<Individual> tmp_pop;
 
-	// assign parents
-	for (int a = 0; a < popsize; a++) {
 
-		int parent_id = weighted_lottery(rnd::reng);
+  for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
 
-		// replicate ann_dev
-		tmp_pop[a].ann_dev = pop[parent_id].ann_dev;
-		tmp_pop[a].ann_life = pop[parent_id].ann_life;
+    fitness.push_back(pop[i].calculate_fitness(kd, ka, tau));
 
-		// reset mismatch
-		tmp_pop[a].mismatch = 0.f;
+  }
 
-		// get dev cue
-		tmp_pop[a].update_I_g(Cue);
+  float mean_fitness = accumulate(fitness.begin(), fitness.end(), 0.f) / static_cast<float>(fitness.size());
 
-		// mutate ann_dev
-		for (auto& w : tmp_pop[a].ann_dev) {
-			// probabilistic mutation of ANN
-			if (mut_event(rnd::reng)) {
-				w += static_cast<float> (m_shift(rnd::reng));
-			}
-		}
+  //Reproduction
+  for (int i = 0; i < static_cast<int>(pop.size()); ++i) 
+  {
+    if (fitness[i] > 0.f) 
+    {
+      int off = std::poisson_distribution<int>(fitness[i] / mean_fitness)(rnd::reng);
+      for (int j = 0; j < off; ++j) {
+        tmp_pop.push_back(pop[i]);
+      }
+    }
+  }
 
-		// mutate ann_life
-		for (auto& w : tmp_pop[a].ann_life) {
-			// probabilistic mutation of ANN
-			if (mut_event(rnd::reng)) {
-				w += static_cast<float> (m_shift(rnd::reng));
-			}
-		}
+  // must have mutation on the temporary population
+  for (int i = 0; i < static_cast<int>(tmp_pop.size()); ++i)
+  {
+  	tmp_pop[i].mutate();
+  }
 
-	}
-
-	//overwrite old pop
-	std::swap(pop, tmp_pop);
-	tmp_pop.clear();
-
+  //overwrite old pop
+  std::swap(pop, tmp_pop);
+  tmp_pop.clear();
 }
 
 /// function for free reproduction
