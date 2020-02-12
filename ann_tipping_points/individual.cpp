@@ -6,8 +6,8 @@ std::uniform_real_distribution<float> node_wt_picker(-1.f, 1.f);
 /// construct indivs
 Individual::Individual() {
     mismatch = 0.f; 
-    ann_dev(node_wt_picker(rnd::reng)); 
-    ann_life(node_wt_picker(rnd::reng));
+    ann_dev(0.f); 
+    ann_life(0.f);
     n = 0.f;
     I_baseline = 0.f;
     I_realized = 0.f;
