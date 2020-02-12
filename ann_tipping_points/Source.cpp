@@ -196,15 +196,16 @@ int main() {
 
             std::ofstream ofs(outfile);
 
-            ofs << "ind,cue,resp" << "\n";
+            ofs << "ind,baseline,cue,resp" << "\n";
 
             for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
 
                 std::vector<float> vec_resp = pop[i].get_reaction(vec_cues);
+                float base = pop[i].I_baseline;
 
                 for (int j = 0; j < static_cast<int>(vec_cues.size()); j++) {
 
-                    ofs << i << "," << vec_cues[j] << "," << vec_resp[j] << "\n";
+                    ofs << i << "," << base << "," << vec_cues[j] << "," << vec_resp[j] << "\n";
 
                 }
 
