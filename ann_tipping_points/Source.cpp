@@ -24,6 +24,7 @@ float E;
 float Cue;
 
 int gmax = 50000;
+const int gext = 1000;
 int tmax = 5;
 
 //Mutation
