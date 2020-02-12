@@ -9,8 +9,8 @@ using namespace ann;
 
 // specify ann structure
 using Ann = Network<float,
-Layer< Neuron<1, activation::tanh::bipolar>, 3>, // for now, 1 input for env cues
-Layer< Neuron<3, activation::tanh::bipolar>, 1>  // one output phenotype value
+Layer< Neuron<1, activation::identity>, 3>, // for now, 1 input for env cues
+Layer< Neuron<3, activation::identity>, 1>  // one output phenotype value
 >;
 
 // individuals
