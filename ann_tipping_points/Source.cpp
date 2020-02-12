@@ -47,179 +47,304 @@ const float cue_inc = 0.05f;
 std::vector<float> vecR = { 1.f, powf(10.f, 0.5f), 10.f, powf(10.f, 1.5f), 100.f, powf(10.f, 2.5f), 1000.f, powf(10.f, 3.5f), 10000.f, powf(10.f, 4.5f), 100000.f };
 std::vector<float> vecP = { 0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f };
 
+// standard vector of cues
+std::vector<float> vec_cues = { 0.f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.f };
+
 // mutation prob
 std::bernoulli_distribution mut_event(0.001); // mutation probability
 // mutation size
 std::cauchy_distribution<double> m_shift(0.0, 0.01); // how much of mutation
 
 // reproduction
-void reproduction(std::vector<Individual> & pop, float kd, float ka, float tau)
+void reproduction(std::vector<Individual>& pop, float kd, float ka, float tau)
 {
-    // make fitness vec
-    std::vector<double> fitness_vec;
-    for (int a = 0; a < popsize; a++)
-    {
-        fitness_vec.push_back(pop[a].calculate_fitness());
-    }
+	// make fitness vec
+	std::vector<double> fitness_vec;
+	for (int a = 0; a < popsize; a++)
+	{
+		fitness_vec.push_back(pop[a].calculate_fitness());
+	}
 
-    // make temp pop vector, position and energy vectors
-    std::vector<Individual> tmp_pop(popsize);
-    std::discrete_distribution<> weighted_lottery(fitness_vec.begin(), fitness_vec.end());
+	// make temp pop vector, position and energy vectors
+	std::vector<Individual> tmp_pop(popsize);
+	std::discrete_distribution<> weighted_lottery(fitness_vec.begin(), fitness_vec.end());
 
-    // assign parents
-    for (int a = 0; a < popsize; a++) {
+	// assign parents
+	for (int a = 0; a < popsize; a++) {
 
-        int parent_id = weighted_lottery(rnd::reng);
+		int parent_id = weighted_lottery(rnd::reng);
 
-        // replicate ann_dev
-        tmp_pop[a].ann_dev = pop[parent_id].ann_dev;
-        tmp_pop[a].ann_life = pop[parent_id].ann_life;
+		// replicate ann_dev
+		tmp_pop[a].ann_dev = pop[parent_id].ann_dev;
+		tmp_pop[a].ann_life = pop[parent_id].ann_life;
 
-        // reset mismatch
-        tmp_pop[a].mismatch = 0.f;
+		// reset mismatch
+		tmp_pop[a].mismatch = 0.f;
 
-        // get dev cue
-        tmp_pop[a].update_I_g(Cue);
+		// get dev cue
+		tmp_pop[a].update_I_g(Cue);
 
-        // mutate ann_dev
-        for (auto& w : tmp_pop[a].ann_dev) {
-            // probabilistic mutation of ANN
-            if (mut_event(rnd::reng)) {
-                w += static_cast<float> (m_shift(rnd::reng));
-            }
-        }
+		// mutate ann_dev
+		for (auto& w : tmp_pop[a].ann_dev) {
+			// probabilistic mutation of ANN
+			if (mut_event(rnd::reng)) {
+				w += static_cast<float> (m_shift(rnd::reng));
+			}
+		}
 
-        // mutate ann_life
-        for (auto& w : tmp_pop[a].ann_life) {
-            // probabilistic mutation of ANN
-            if (mut_event(rnd::reng)) {
-                w += static_cast<float> (m_shift(rnd::reng));
-            }
-        }
+		// mutate ann_life
+		for (auto& w : tmp_pop[a].ann_life) {
+			// probabilistic mutation of ANN
+			if (mut_event(rnd::reng)) {
+				w += static_cast<float> (m_shift(rnd::reng));
+			}
+		}
 
-    }
+	}
 
-    //overwrite old pop
-    std::swap(pop, tmp_pop);
-    tmp_pop.clear();
+	//overwrite old pop
+	std::swap(pop, tmp_pop);
+	tmp_pop.clear();
 
+}
+
+/// function for free reproduction
+std::vector<Individual> free_reproduction(std::vector<Individual>& pop) {
+
+	//Calculate fitness
+	std::vector<float> fitness;
+	std::vector<Individual> tmp_pop;
+
+
+	for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
+
+		fitness.push_back(pop[i].calculate_fitness(kd, ka, tau));
+
+	}
+
+	@@ this should break
+	//Reproduction according to botero
+	for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
+		if (fitness[i] > 0.f) {
+			int off = std::poisson_distribution<int>(q * fitness[i] / 1.0f)(rnd::reng); //Wmax is equal to 1, right?
+			for (int j = 0; j < off; ++j) {
+				tmp_pop.push_back(pop[i]);
+			}
+
+		}
+
+	}
+
+	//incorporated pop adjust
+	while (static_cast<int>(tmp_pop.size()) > popsize) {
+		int remove = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
+		tmp_pop.erase(tmp_pop.begin() + remove);
+	}
+
+	return tmp_pop;
 }
 
 // adjust pop size
 void adjust_popsize(std::vector<Individual>& tmp_pop, const int targetsize) {
 
-    while (static_cast<int>(tmp_pop.size()) < targetsize) {
-        int duplicate = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
-        tmp_pop.push_back(tmp_pop[duplicate]);
-    }
+	while (static_cast<int>(tmp_pop.size()) < targetsize) {
+		int duplicate = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
+		tmp_pop.push_back(tmp_pop[duplicate]);
+	}
 
-    while (static_cast<int>(tmp_pop.size()) > targetsize) {
-        int remove = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
-        tmp_pop.erase(tmp_pop.begin() + remove);
-    }
+	while (static_cast<int>(tmp_pop.size()) > targetsize) {
+		int remove = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
+		tmp_pop.erase(tmp_pop.begin() + remove);
+	}
 
 }
 
-/// main function
+/// plot output
+void print_reaction_norm(const float R, const float P, std::vector<Individual>& pop,
+	const std::vector<float> vec_cues)
+{
+	// get filename
+	const std::string outfile = "data/data_ann_logR" + std::to_string(log10f(R)).substr(0, 3) + "_P" + std::to_string(P).substr(0, 3) + ".txt";
+	std::ofstream ofs(outfile);
 
+	ofs << "ind,baseline,cue,resp" << "\n";
+
+	for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
+
+		std::vector<float> vec_resp = pop[i].get_reaction(vec_cues);
+		float base = pop[i].I_baseline;
+
+		for (int j = 0; j < static_cast<int>(vec_cues.size()); j++) {
+
+			ofs << i << "," << base << "," << vec_cues[j] << "," << vec_resp[j] << "\n";
+		}
+	}
+	ofs.close();
+}
+
+/// print extinction data
+void print_extinction_data(const float R, const float P, const float R_new, const float P_new, const int which_gen, bool is_this_extinct)
+{
+	// filename for ofstream
+	const std::string extinct_out = "data/extinction_data.csv";
+	std::ofstream ext_ofs;
+
+	// check if DOES NOT exist then write col names
+	std::ifstream f(extinct_out.c_str());
+	if (!f.good()) {
+		ext_ofs.open(extinct_out, std::ofstream::out);
+		ext_ofs << "R,P,R_new,P_new,is_extinct" << "\n";
+	}
+	
+	// then append data
+	ext_ofs.open(extinct_out, std::ofstream::app);
+	ext_ofs << R << "," << P << "," << R_new << "," << P_new << "," << is_this_extinct << "\n";
+	
+}
+
+/// function to evolve population
+std::vector<Individual> evolve_pop(std::vector<Individual> pop, const float R, const float P)
+{
+	// re init agents
+	std::vector<Individual> pop(popsize);
+
+	//Initialization
+	E = 0.f;
+	if (1.f - P == 0.f) {
+		Cue = E;
+	}
+	else {
+		Cue = std::normal_distribution<float>(P * E, ((1.f - P) / 3.f))(rnd::reng);
+	}
+
+	for (int i = 0; i < static_cast<int>(pop.size()); i++) {
+		pop[i].update_I_g(Cue);
+	}
+
+	// print info
+	std::cout << "R = " << R << " P = " << P << "\n";
+	// generations
+	for (int g = 0; g < gmax; g++)
+	{
+		for (int t = 0; t < tmax; t++) {
+			//update environment
+			E = A * std::sinf((2 * static_cast<float>(M_PI)* (static_cast<float>(g)* static_cast<float>(tmax) +
+				static_cast<float>(t))) / (static_cast<float>(tmax)* R)) + B * env_dist(rnd::reng);
+			//calculate cue
+			if (1.f - P == 0.f) {
+				Cue = E;
+			}
+			else {
+				Cue = std::normal_distribution<float>(P * E, ((1.f - P) / 3.f))(rnd::reng);
+			}
+
+			//individual update during lifetime
+			for (int i = 0; i < pop.size(); ++i) {
+
+				pop[i].update_I_t(Cue);
+				pop[i].update_mismatch(E);
+
+			}
+
+		}
+		reproduction(pop, kd, ka, tau);
+
+	}
+
+	return pop;
+}
+
+/// function to shift population and assess extinction
+void test_extinction(std::vector<Individual> pop, const float R, const float P, const float R_new, const float P_new)
+{
+	bool is_extinct;
+	float E; float Cue;
+	std::vector<Individual> tmp_pop;
+
+	// implement phase maintenance
+	int tnew = roundf(gmax * tmax * R_new / R);
+	int g_init = tnew / tmax;
+	int t_init = tnew % tmax;
+
+	// continue evolution with new R and P
+	{
+		for (int g = g_init; g < g_init + gext; g++) {
+
+			for (int t = t_init; t < t_init + tmax; t++) {
+				//the generations are now shifted by t_init, to keep the phase displacement to a minimum.
+				//All but pretty, but i don't see any other way and i think it works correctly
+
+				//update environment
+
+				E = std::sinf((2.f * static_cast<float>(M_PI)* static_cast<float>(static_cast<float>(g)* tmax + t)) / (static_cast<float>(tmax)* R));
+
+				//calculate cue
+				if (1.f - P == 0.f) {
+					Cue = E;
+				}
+				else {
+					Cue = std::normal_distribution<float>(P * E, ((1.f - P) / 3.f))(rnd::reng);
+				}
+				
+				//individual update
+				for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
+
+					pop[i].update_I_t(Cue);         //Insulation
+					pop[i].update_mismatch(E);      //phenotypic mismatch
+
+				}
+
+			}
+
+			//Reproduction with flexible pop size
+			tmp_pop = free_reproduction(pop);
+
+			if (tmp_pop.size() == 0) {
+				is_extinct = true;
+
+				// print extinction data and break
+				print_extinction_data(R, P, R_new, P_new, g, is_extinct);
+				std::cout << "Extinction!!!" << std::endl;
+				break;
+			}
+
+			//Mutation
+			for (int i = 0; i < static_cast<int>(tmp_pop.size()); i++) {
+
+				tmp_pop[i].mutate(mrate, mmean, mshape);
+				tmp_pop[i].update_I_g(Cue);
+			}
+
+			std::swap(pop, tmp_pop);
+			tmp_pop.clear();
+		}
+
+
+	}
+
+	std::cout << "pop survived!\n";
+}
+
+/// main function
 int main() {
 
-    // float someval = std::normal_distribution<float>(0.f, 0.00000001f)(rnd::reng);
-
-    // standard vector of cues
-    std::vector<float> vec_cues;
-    for (float i = cue_min; i < cue_max; i+=cue_inc)
-    {
-        vec_cues.push_back(i);
-    }
-
-    for (int r = 0; r < vecR.size(); ++r) {
-
-        float R = vecR[r];
-
-        for (int p = 0; p < vecP.size(); ++p) {
-
-            float P = vecP[p];
-            // re init agents
-            std::vector<Individual> pop(popsize);
-
-            //Initialization
-            E = 0.f;
-            if (1.f - P == 0.f) {
-                Cue = E;
-            }
-            else {
-                Cue = std::normal_distribution<float>(P * E, ((1.f - P) / 3.f))(rnd::reng);
-            }
-
-            for (int i = 0; i < static_cast<int>(pop.size()); i++) {
-                pop[i].update_I_g(Cue);
-            }
-
-            // print info
-            std::cout << "R = " << R << " P = " << P << "\n";
-            // generations
-            for (int g = 0; g < gmax; g++)
-            {
-                // print gens
-                if (g % 1 == 0) {
-                    std::cout << "gen = " << g << "\n";
-                }
-
-                for (int t = 0; t < tmax; t++) {
-                    //update environment
-                    E = A * std::sinf((2 * static_cast<float>(M_PI) * (static_cast<float>(g) * static_cast<float>(tmax) + 
-                        static_cast<float>(t))) / (static_cast<float>(tmax) * R)) + B * env_dist(rnd::reng);
-                    //calculate cue
-                    if (1.f - P == 0.f) {
-                        Cue = E;
-                    }
-                    else {
-                        Cue = std::normal_distribution<float>(P * E, ((1.f - P) / 3.f))(rnd::reng);
-                    }
-                    
-                    //individual update during lifetime
-                    for (int i = 0; i < pop.size(); ++i) {
-
-                        pop[i].update_I_t(Cue);
-                        pop[i].update_mismatch(E);
-
-                    }
-
-                }
-                reproduction(pop, kd, ka, tau);
-
-            }
 
 
-            const std::string outfile = "data/data_ann_logR" + std::to_string(log10f(R)).substr(0, 3) + "_P" + std::to_string(P).substr(0, 3) + ".txt";
+	for (int r = 0; r < vecR.size(); ++r) {
+
+		float R = vecR[r];
+
+		for (int p = 0; p < vecP.size(); ++p) {
+
+			float P = vecP[p];
 
 
-            std::ofstream ofs(outfile);
-
-            ofs << "ind,baseline,cue,resp" << "\n";
-
-            for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
-
-                std::vector<float> vec_resp = pop[i].get_reaction(vec_cues);
-                float base = pop[i].I_baseline;
-
-                for (int j = 0; j < static_cast<int>(vec_cues.size()); j++) {
-
-                    ofs << i << "," << base << "," << vec_cues[j] << "," << vec_resp[j] << "\n";
-
-                }
+		}
+	}
 
 
 
-            }
-            ofs.close();
-        }
-    }
-
-
-
-        return 0;
+	return 0;
 }
 
 
