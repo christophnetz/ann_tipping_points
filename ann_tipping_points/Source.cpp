@@ -108,7 +108,6 @@ std::vector<Individual> free_reproduction(std::vector<Individual>& pop) {
 
 	}
 
-	@@ this should break
 	//Reproduction according to botero
 	for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
 		if (fitness[i] > 0.f) {
