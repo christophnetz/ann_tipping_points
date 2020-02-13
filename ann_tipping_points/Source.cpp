@@ -225,7 +225,7 @@ std::vector<Individual> evolve_pop(std::vector<Individual> pop, const float R, c
 			}
 
 			//individual update during lifetime
-			for (int i = 0; i < pop.size(); ++i) {
+			for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
 
 				pop[i].update_I_t(Cue);
 				pop[i].update_mismatch(E);
