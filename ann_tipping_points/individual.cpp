@@ -36,27 +36,22 @@ void Individual::update_I_t(const float C) {
 }
 
 /// function ann fitness 
-float Individual::calculate_fitness_ann() {
+float Individual::calculate_fitness_ann(const float ka, const float tau) {
 
-    /*float tot_mut_dist = 0.f;
+    float tot_mut_dist = 0.f;
     for (auto& w : ann_life) {
         tot_mut_dist += abs(w);
     }
 
     float fit;
     if (tot_mut_dist > 0.f) {
-        fit = exp(-tau * mismatch) - kd - n * ka;
+        fit = exp(-tau * mismatch) - (ka * tot_mut_dist);
     }
     else {
         fit = exp(-tau * mismatch);
     }
     mismatch = 0.f;
 
-    if (fit <= 0.f)
-        fit = 0.0000001f;
-
-    return fit;*/
-    float fit = 1.f / mismatch;
     if (fit <= 0.f)
         fit = 0.0000001f;
 
