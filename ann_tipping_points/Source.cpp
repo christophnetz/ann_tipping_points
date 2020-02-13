@@ -77,7 +77,7 @@ std::vector<Individual> reproduction(std::vector<Individual>& pop) {
 
   for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
 
-    fitness.push_back(pop[i].calculate_fitness_ann());
+    fitness.push_back(pop[i].calculate_fitness_ann(ka, tau));
 
   }
 
@@ -117,7 +117,7 @@ std::vector<Individual> free_reproduction(std::vector<Individual>& pop) {
 
 	for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
 
-		fitness.push_back(pop[i].calculate_fitness_ann());
+		fitness.push_back(pop[i].calculate_fitness_ann(ka, tau));
 
 	}
 
