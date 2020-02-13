@@ -178,23 +178,24 @@ void print_extinction_data(const float R, const float P, const float R_new,
 	std::ifstream f(extinct_out.c_str());
 	if (!f.good()) {
 		ext_ofs.open(extinct_out, std::ofstream::out);
-		ext_ofs << "R,P,R_new,P_new,is_extinct" << "\n";
+		ext_ofs << "R,P,R_new,P_new,gen_extinct" << "\n";
 	}
 	
 	// then append data
 	ext_ofs.open(extinct_out, std::ofstream::app);
-	ext_ofs << R << "," << P << "," << R_new << "," << P_new << "," << is_this_extinct << "\n";
+	ext_ofs << log10f(R) << "," << P << "," 
+		<< log10f(R_new) << "," << P_new << "," 
+		<< which_gen << "\n";
 	
 }
 
 /// function to evolve population
 std::vector<Individual> evolve_pop(std::vector<Individual> pop, const float R, const float P)
 {
-	// re init agents
-	std::vector<Individual> pop(popsize);
-
 	//Initialization
-	E = 0.f;
+	std::vector<Individual> tmp_pop;
+	float E = 0.f;
+	float Cue;
 	if (1.f - P == 0.f) {
 		Cue = E;
 	}
