@@ -233,28 +233,32 @@ std::vector<Individual> evolve_pop(std::vector<Individual> pop, const float R, c
 			}
 
 		}
-		reproduction(pop, kd, ka, tau);
-
+		pop = reproduction(pop);
 	}
-
+	std::cout << "pop evolved...\n";
 	return pop;
 }
 
 /// function to shift population and assess extinction
 void test_extinction(std::vector<Individual> pop, const float R, const float P, const float R_new, const float P_new)
 {
-	bool is_extinct;
 	float E; float Cue;
 	std::vector<Individual> tmp_pop;
 
 	// implement phase maintenance
-	int tnew = roundf(gmax * tmax * R_new / R);
+	int tnew = static_cast<int>(roundf(gmax * tmax * R_new / R));
 	int g_init = tnew / tmax;
 	int t_init = tnew % tmax;
 
 	// continue evolution with new R and P
 	{
 		for (int g = g_init; g < g_init + gext; g++) {
+
+			std::cout << "new R = " << log10f(R_new) << " new P = " << P_new << "\n";
+
+			if ((g - g_init) % 100 == 0 || (g - g_init) == 0) {
+				std::cout << "g = " << g - g_init << " popsize = " << pop.size() << "\n";
+			}
 
 			for (int t = t_init; t < t_init + tmax; t++) {
 				//the generations are now shifted by t_init, to keep the phase displacement to a minimum.
