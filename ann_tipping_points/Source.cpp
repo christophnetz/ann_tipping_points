@@ -167,7 +167,8 @@ void print_reaction_norm(const float R, const float P, std::vector<Individual>& 
 }
 
 /// print extinction data
-void print_extinction_data(const float R, const float P, const float R_new, const float P_new, const int which_gen, bool is_this_extinct)
+void print_extinction_data(const float R, const float P, const float R_new, 
+	const float P_new, const int which_gen)
 {
 	// filename for ofstream
 	const std::string extinct_out = "data/extinction_data.csv";
