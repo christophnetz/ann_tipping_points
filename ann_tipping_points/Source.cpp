@@ -290,49 +290,56 @@ void test_extinction(std::vector<Individual> pop, const float R, const float P, 
 			tmp_pop = free_reproduction(pop);
 
 			if (tmp_pop.size() == 0) {
-				is_extinct = true;
-
 				// print extinction data and break
-				print_extinction_data(R, P, R_new, P_new, g, is_extinct);
-				std::cout << "Extinction!!!" << std::endl;
+				print_extinction_data(R, P, R_new, P_new, g - g_init);
+				std::cout << "pop extinct! g = " << g - g_init << "\n\n";
 				break;
 			}
 
 			//Mutation
 			for (int i = 0; i < static_cast<int>(tmp_pop.size()); i++) {
 
-				tmp_pop[i].mutate(mrate, mmean, mshape);
+				tmp_pop[i].mutate();
 				tmp_pop[i].update_I_g(Cue);
 			}
 
 			std::swap(pop, tmp_pop);
 			tmp_pop.clear();
+
+			if (g == g_init + gext)
+			{
+				std::cout << "pop survived!\n";
+				print_extinction_data(R, P, R_new, P_new, g);
+			}
 		}
 
-
 	}
-
-	std::cout << "pop survived!\n";
 }
 
 /// main function
 int main() {
 
-
-
-	for (int r = 0; r < vecR.size(); ++r) {
-
+	for (int r = 0; r < static_cast<int>(vecR.size()); ++r) {
 		float R = vecR[r];
-
-		for (int p = 0; p < vecP.size(); ++p) {
-
+		for (int p = 0; p < static_cast<int>(vecP.size()); ++p) {
 			float P = vecP[p];
 
+			// make agents and evolve and print evolved reaction norm
+			std::vector<Individual> pop(popsize);
+			pop = evolve_pop(pop, R, P);
+			print_reaction_norm(R, P, pop, vec_cues);
+
+			// test evolved agents for extinction
+			for (int r_new = 0; r_new < static_cast<int>(vecR.size()); ++r_new) {
+				float R_new = vecR[r_new];
+				for (int p_new = 0; p_new < static_cast<int>(vecP.size()); ++p_new) {
+					float P_new = vecP[p_new];
+					test_extinction(pop, R, P, R_new, P_new);
+				}
+			}
 
 		}
 	}
-
-
 
 	return 0;
 }
