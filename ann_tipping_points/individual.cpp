@@ -96,6 +96,7 @@ float Individual::calculate_fitness(float kd, float ka, float tau) {
     fit = exp(-tau * mismatch);
   }
   mismatch = 0.f;
+  n = 0;
 
   if (fit < 0.f)
     fit = 0.f;
