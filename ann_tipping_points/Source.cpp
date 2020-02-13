@@ -117,7 +117,7 @@ std::vector<Individual> free_reproduction(std::vector<Individual>& pop) {
 
 	for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
 
-		fitness.push_back(pop[i].calculate_fitness(kd, ka, tau));
+		fitness.push_back(pop[i].calculate_fitness_ann());
 
 	}
 
@@ -142,20 +142,6 @@ std::vector<Individual> free_reproduction(std::vector<Individual>& pop) {
 	return tmp_pop;
 }
 
-// adjust pop size
-void adjust_popsize(std::vector<Individual>& tmp_pop, const int targetsize) {
-
-	while (static_cast<int>(tmp_pop.size()) < targetsize) {
-		int duplicate = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
-		tmp_pop.push_back(tmp_pop[duplicate]);
-	}
-
-	while (static_cast<int>(tmp_pop.size()) > targetsize) {
-		int remove = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
-		tmp_pop.erase(tmp_pop.begin() + remove);
-	}
-
-}
 
 /// plot output
 void print_reaction_norm(const float R, const float P, std::vector<Individual>& pop,
