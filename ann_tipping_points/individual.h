@@ -23,6 +23,7 @@ struct Individual {
     float mismatch, n;
     void update_I_g(const float C);
     void update_I_t(const float C);
+    void mutate();
     inline void update_mismatch(const float E) { mismatch += abs(E - I_realized); }
     float calculate_fitness();
     std::vector<float> get_reaction(const std::vector<float> vec_cues);
