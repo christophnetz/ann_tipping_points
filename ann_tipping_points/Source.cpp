@@ -212,6 +212,11 @@ std::vector<Individual> evolve_pop(std::vector<Individual> pop, const float R, c
 	// generations
 	for (int g = 0; g < gmax; g++)
 	{
+		if (g % 1000 == 0) {
+			std::cout << "\r";
+			std::cout.flush();
+			std::cout << g;
+		}
 		for (int t = 0; t < tmax; t++) {
 			//update environment
 			E = A * std::sinf((2 * static_cast<float>(M_PI)* (static_cast<float>(g)* static_cast<float>(tmax) +
@@ -249,15 +254,13 @@ void test_extinction(std::vector<Individual> pop, const float R, const float P, 
 	int tnew = static_cast<int>(roundf(gmax * tmax * R_new / R));
 	int g_init = tnew / tmax;
 	int t_init = tnew % tmax;
-
+	std::cout << "new R = " << log10f(R_new) << " new P = " << P_new << "\n";
 	// continue evolution with new R and P
 	{
-		for (int g = g_init; g < g_init + gext; g++) {
-
-			std::cout << "new R = " << log10f(R_new) << " new P = " << P_new << "\n";
+		for (int g = g_init; g < g_init + gext; g++) {			
 
 			if ((g - g_init) % 100 == 0 || (g - g_init) == 0) {
-				std::cout << "g = " << g - g_init << " popsize = " << pop.size() << "\n";
+				std::cout << "g = " << g - g_init << " popsize = " << pop.size() << "; ";
 			}
 
 			for (int t = t_init; t < t_init + tmax; t++) {
@@ -314,6 +317,7 @@ void test_extinction(std::vector<Individual> pop, const float R, const float P, 
 		}
 
 	}
+	std::cout << "\n";
 }
 
 /// main function
