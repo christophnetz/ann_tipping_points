@@ -51,13 +51,24 @@ std::vector<float> vecP = { 0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f
 // standard vector of cues
 std::vector<float> vec_cues = { 0.f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.f };
 
-// mutation prob
-std::bernoulli_distribution mut_event(0.001); // mutation probability
-// mutation size
-std::cauchy_distribution<double> m_shift(0.0, 0.01); // how much of mutation
+// adjust pop size
+void adjust_popsize(std::vector<Individual>& tmp_pop, const int targetsize) {
+
+	while (static_cast<int>(tmp_pop.size()) < targetsize) {
+		int duplicate = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
+		tmp_pop.push_back(tmp_pop[duplicate]);
+	}
+
+	while (static_cast<int>(tmp_pop.size()) > targetsize) {
+		int remove = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
+		tmp_pop.erase(tmp_pop.begin() + remove);
+	}
+
+}
+
 
 /// reproduction with fixed pop size
-void reproduction(std::vector<Individual>& pop, float kd, float ka, float tau) {
+std::vector<Individual> reproduction(std::vector<Individual>& pop) {
 
   //Calculate fitness
   std::vector<float> fitness;
