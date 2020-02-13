@@ -20,12 +20,13 @@ float R = 10.f;  //Environmental variation
 float P = 0.99f;   //predictability
 ///
 const auto& env_dist = std::uniform_real_distribution<float>(-1.f, 1.f); // not explicitly stated in botero 2015
-float E;
-float Cue;
 
 int gmax = 50000;
 const int gext = 1000;
 int tmax = 5;
+
+// magic number of offsprin
+float q = 2.2f;
 
 //Mutation
 const float mrate = 0.001f;
