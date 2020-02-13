@@ -2,6 +2,11 @@
 
 /// uniform dist of node weights
 std::uniform_real_distribution<float> node_wt_picker(-1.f, 1.f);
+// mutation prob
+std::bernoulli_distribution mut_event(0.001); // mutation probability
+// mutation size
+std::cauchy_distribution<double> m_shift(0.0, 0.01); // how much of mutation
+
 
 /// construct indivs
 Individual::Individual() {
@@ -31,7 +36,7 @@ void Individual::update_I_t(const float C) {
 }
 
 /// function ann fitness 
-float Individual::calculate_fitness() {
+float Individual::calculate_fitness_ann() {
 
     /*float tot_mut_dist = 0.f;
     for (auto& w : ann_life) {
