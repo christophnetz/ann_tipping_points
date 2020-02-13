@@ -77,7 +77,7 @@ std::vector<Individual> reproduction(std::vector<Individual>& pop) {
 
   for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
 
-    fitness.push_back(pop[i].calculate_fitness(kd, ka, tau));
+    fitness.push_back(pop[i].calculate_fitness_ann());
 
   }
 
@@ -101,9 +101,10 @@ std::vector<Individual> reproduction(std::vector<Individual>& pop) {
   	tmp_pop[i].mutate();
   }
 
-  //overwrite old pop
-  std::swap(pop, tmp_pop);
-  tmp_pop.clear();
+  // adjust pop size
+  adjust_popsize(tmp_pop, pop.size());
+
+  return tmp_pop;
 }
 
 /// function for free reproduction
