@@ -34,23 +34,30 @@ process_cue <- function(h, I01, I02, b1, b2, s, a){
   
   # work through parameters getting slope and intercept
   if(s <= 0.5){
-    if(h < 1){
+    if(h < 1 && h > 0){
       # name strategy
       data_rnorm <- data.table(intercept = c(I01, I02),
                                slope = 0, strategy = c("dbh1", "dbh2"))
       
-    }else{
+    }else if (h >= 1 ){
       data_rnorm <- data.table(intercept = I01, slope = 0, strategy = "cbh/adt")
     }
+    else if (h  <= 0){
+      data_rnorm <- data.table(intercept = I02, slope = 0, strategy = "cbh/adt")
+    }
   }else{
-    if(h < 1){
+    if(h < 1 && h > 0){
       # name strategy
       data_rnorm <- data.table(intercept = c(I01, I02), slope = c(b1, b2),
                                strategy = c("pbh02", "pbh02"))
       
-    }else{
+    }else if (h >= 1 ){
       data_rnorm <- data.table(intercept = I01, slope = b1,
-                               strategy = ifelse(a < 0, "dev_plast", "fen_plast"))
+                               strategy = ifelse(a <= 0, "dev_plast", "fen_plast"))
+    }
+    else if (h <= 0 ){
+      data_rnorm <- data.table(intercept = I02, slope = b2,
+                               strategy = ifelse(a <= 0, "dev_plast", "fen_plast"))
     }
   }
   
@@ -69,12 +76,12 @@ data <- select(data, -agents) %>%
 
 # plot figure
 ggplot(data)+
-  geom_abline(aes(intercept = intercept, slope = slope), 
+  geom_abline(aes(intercept = intercept, slope = slope, col = strategy), 
               alpha = 0.1)+
   scale_x_continuous(limits = c(0,1))+
   scale_y_continuous(limits = c(0,1))+
   coord_cartesian(xlim=c(-1,1), ylim=c(-1, 1))+
-  # scale_colour_manual(values = c("black", "red", "green", "green", "yellow", "blue"))+
+  scale_colour_manual(values = c("black", "green", "green", "blue", "red", "yellow"))+
   facet_grid(P~R, labeller = label_both, as.table = FALSE)+
   theme(strip.placement = "inside")+
   theme_bw()
