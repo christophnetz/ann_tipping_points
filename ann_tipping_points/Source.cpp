@@ -257,9 +257,10 @@ void test_extinction(std::vector<Individual> pop, const float R, const float P, 
 	std::cout << "new R = " << log10f(R_new) << " new P = " << P_new << "\n";
 	// continue evolution with new R and P
 	{
-		for (int g = g_init; g < g_init + gext; g++) {			
-
-			if ((g - g_init) % 100 == 0 || (g - g_init) == 0) {
+		for (int g = g_init; g < g_init + gext; g++) 
+		{	
+			if ((g - g_init) % 100 == 0 || (g - g_init) == 0) 
+			{
 				std::cout << "g = " << g - g_init << " popsize = " << pop.size() << "; ";
 			}
 
@@ -311,10 +312,11 @@ void test_extinction(std::vector<Individual> pop, const float R, const float P, 
 
 			if (g == g_init + gext)
 			{
-				std::cout << "pop survived!\n";
-				print_extinction_data(R, P, R_new, P_new, g);
+				
 			}
 		}
+		std::cout << "pop survived!\n";
+		print_extinction_data(R, P, R_new, P_new, gext);
 
 	}
 	std::cout << "\n";
