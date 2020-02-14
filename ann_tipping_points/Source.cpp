@@ -189,6 +189,29 @@ void print_extinction_data(const float R, const float P, const float R_new,
 	
 }
 
+/// print extinction test
+void print_ext_popsize(const float R, const float P, const float R_new,
+	const float P_new, const int which_gen, const int popsize)
+{
+	// filename for ofstream
+	const std::string extinct_out = "data/pop_trend_data.csv";
+	std::ofstream ext_ofs;
+
+	// check if DOES NOT exist then write col names
+	std::ifstream f(extinct_out.c_str());
+	if (!f.good()) {
+		ext_ofs.open(extinct_out, std::ofstream::out);
+		ext_ofs << "R,P,R_new,P_new,gen,popsize" << "\n";
+	}
+
+	// then append data
+	ext_ofs.open(extinct_out, std::ofstream::app);
+	ext_ofs << log10f(R) << "," << P << ","
+		<< log10f(R_new) << "," << P_new << ","
+		<< which_gen << ","
+		<< popsize << "\n";
+}
+
 /// function to evolve population
 std::vector<Individual> evolve_pop(std::vector<Individual> pop, const float R, const float P)
 {
@@ -259,11 +282,11 @@ void test_extinction(std::vector<Individual> pop, const float R, const float P, 
 	{
 		for (int g = g_init; g < g_init + gext; g++) 
 		{	
-			if ((g - g_init) % 100 == 0 || (g - g_init) == 0) 
+			if ((g - g_init) % 50 == 0 || (g - g_init) == 0) 
 			{
-				std::cout << "g = " << g - g_init << " popsize = " << pop.size() << "; ";
+				print_ext_popsize(R, P, R_new, P_new, (g - g_init), pop.size());
 			}
-
+			
 			for (int t = t_init; t < t_init + tmax; t++) {
 				//the generations are now shifted by t_init, to keep the phase displacement to a minimum.
 				//All but pretty, but i don't see any other way and i think it works correctly
