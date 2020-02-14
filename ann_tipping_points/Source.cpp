@@ -96,7 +96,7 @@ std::vector<Individual> free_reproduction(std::vector<Individual>& pop) {
 
   //incorporated pop adjust
   while (static_cast<int>(tmp_pop.size()) > popsize) {
-    int remove = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
+    int remove = std::uniform_int_distribution<int>(0, static_cast<int>(tmp_pop.size()) - 1)(rnd::reng);
     tmp_pop.erase(tmp_pop.begin() + remove);
   }
 
@@ -106,12 +106,12 @@ std::vector<Individual> free_reproduction(std::vector<Individual>& pop) {
 void adjust_popsize(std::vector<Individual>& tmp_pop, const int targetsize) {
 
   while (static_cast<int>(tmp_pop.size()) < targetsize) {
-    int duplicate = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
+    int duplicate = std::uniform_int_distribution<int>(0, static_cast<int>(tmp_pop.size()) - 1)(rnd::reng);
     tmp_pop.push_back(tmp_pop[duplicate]);
   }
 
   while (static_cast<int>(tmp_pop.size()) > targetsize) {
-    int remove = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
+    int remove = std::uniform_int_distribution<int>(0, static_cast<int>(tmp_pop.size()) - 1)(rnd::reng);
     tmp_pop.erase(tmp_pop.begin() + remove);
   }
 
@@ -169,7 +169,7 @@ void simulation1(std::vector<Individual>& pop, const float& P, const float& R) {
     tmp_pop = reproduction(pop);
 
     //Adjust pop size
-    adjust_popsize(tmp_pop, pop.size());
+    adjust_popsize(tmp_pop, static_cast<int>(pop.size()));
 
 
     //Mutation
@@ -186,17 +186,17 @@ void simulation1(std::vector<Individual>& pop, const float& P, const float& R) {
 
 }
 
-void simulation2(const float& P, const float& R, const float& Rold, std::vector<Individual> pop, int& extinction) {
-  float E;
-  float Cue;
+void simulation2(const float& P, const float& R, const float& Pold, const float& Rold, std::vector<Individual> pop, float& extinction, float& g_extinction) {
+  float E = 0.f;
+  float Cue = 0.f;
   std::vector<Individual> tmp_pop;
 
   //Phase maintenance
-  int tnew = roundf(gmax * tmax * R / Rold);
+  int tnew = static_cast<int>(roundf(gmax * tmax * R / Rold));
   int g_init = tnew / tmax;
   int t_init = tnew % tmax;
 
-
+  g_extinction += static_cast<float>(gext);
 
   for (int g = g_init; g < g_init + gext; g++) {
 
@@ -234,8 +234,10 @@ void simulation2(const float& P, const float& R, const float& Rold, std::vector<
     tmp_pop = free_reproduction(pop);
 
     if (tmp_pop.size() == 0) {
-      extinction += 1;
-      std::cout << "Extinction!!!" << std::endl;
+      extinction += 1.f;
+      g_extinction += static_cast<float>(g - g_init);
+      g_extinction -= static_cast<float>(gext);
+      std::cout << "Extinction!!!    " << g_extinction << std::endl;
       break;
     }
 
@@ -275,19 +277,16 @@ int main() {
 
 
 
-  const std::string outfile2 = "extinction_data.txt";
+  const std::string outfile2 = "extinction_data.csv";
   std::ofstream ofs2(outfile2);
-  ofs2 << "Pold" << "\t" << "Pnew" << "\t" << "Rold" << "\t" << "Rnew" << "\t" << "extinction" << "\n";
+  ofs2 << "R,P,R_new,P_new,extinct,gen_extinct" << "\n";
 
 
 
 
   for (int r = 0; r < vecR.size(); ++r) {
-
     float R = vecR[r];
-
     for (int p = 0; p < vecP.size(); ++p) {
-
       float P = vecP[p];
 
 
@@ -297,20 +296,13 @@ int main() {
       simulation1(pop, P, R);
 
       //    std::string filetype = ".png";
-
       const std::string outfile = "data_logR" + std::to_string(log10f(R)).substr(0, 3) + "_P" + std::to_string(P).substr(0, 3) + ".txt";
-
-
       std::ofstream ofs(outfile);
-
       ofs << "ind" << "\t" << "h" << "\t" << "I01" << "\t" << "I02" << "\t" << "b1" << "\t" << "b2" << "\t" << "s" << "\t" << "a" << "\n";
 
       for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
-
         ofs << i << "\t" << pop[i].h << "\t" << pop[i].I01 << "\t" << pop[i].I02 << "\t" << pop[i].b1 << "\t" << pop[i].b2 << "\t" << pop[i].s << "\t" << pop[i].a << "\n";
-
       }
-
       ofs.close();
 
 
@@ -319,34 +311,23 @@ int main() {
       //Questions: shift population just once/ a hundred times?
       //What's this relative extinction rate?
 
+      
 
-      std::vector<int> extinction = { 0,0,0,0,0 };
-      if (p > 0) {
-        simulation2(vecP[p - 1], R, R, pop, extinction[0]);
-        ofs2 << P << "\t" << vecP[p - 1] << "\t" << R << "\t" << R << "\t" << extinction[0] << "\n";
-      }
-      if (p < vecP.size() - 1) {
-        simulation2(vecP[p + 1], R, R, pop, extinction[1]);
-        ofs2 << P << "\t" << vecP[p + 1] << "\t" << R << "\t" << R << "\t" << extinction[1] << "\n";
-
-      }
-      if (r > 0) {
-        simulation2(P, vecR[r - 1], R, pop, extinction[2]);
-        ofs2 << P << "\t" << P << "\t" << R << "\t" << vecR[r - 1] << "\t" << extinction[2] << "\n";
-
-      }
-      if (r < vecR.size() - 1) {
-        simulation2(P, vecR[r + 1], R, pop, extinction[3]);
-        ofs2 << P << "\t" << P << "\t" << R << "\t" << vecR[r + 1] << "\t" << extinction[3] << "\n";
+      for (int r_new = 0; r_new < vecR.size(); ++r_new) {
+        float R_new = vecR[r_new];
+        for (int p_new = 0; p_new < vecP.size(); ++p_new) {
+          float P_new = vecP[p_new];
+          float extinction = 0.f;
+          float g_extinction = 0.f;
+          for (int sim2 = 0; sim2 < 10; sim2++) {
+            simulation2(P_new, R_new, P, R, pop, extinction, g_extinction);
+          }
+          ofs2 << log10f(R) << "," << P << "," << log10f(R_new) << "," << P_new << "," << extinction / 10.f << "," << g_extinction / 10.f<< "\n";
+          std::cout << g_extinction << std::endl;
+        }
 
       }
-
-      simulation2(P, R, R, pop, extinction[4]);
-      ofs2 << P << "\t" << P << "\t" << R << "\t" << R << "\t" << extinction[4] << "\n";
-
-
-
-
+      
 
 
 
