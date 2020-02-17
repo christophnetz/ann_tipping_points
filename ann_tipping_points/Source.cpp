@@ -333,14 +333,14 @@ void test_extinction(std::vector<Individual> pop, const float R, const float P, 
 			std::swap(pop, tmp_pop);
 			tmp_pop.clear();
 
-			if (g == g_init + gext)
+			if (g == g_init + gext - 1)
 			{
-				
+				std::cout << "pop survived!\n";
+				print_extinction_data(R, P, R_new, P_new, gext);
+
 			}
 		}
-		std::cout << "pop survived!\n";
-		print_extinction_data(R, P, R_new, P_new, gext);
-
+		
 	}
 	std::cout << "\n";
 }
