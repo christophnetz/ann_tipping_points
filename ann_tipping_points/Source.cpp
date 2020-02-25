@@ -237,7 +237,7 @@ void simulation2(const float& P, const float& R, const float& Pold, const float&
       extinction += 1.f;
       g_extinction += static_cast<float>(g - g_init);
       g_extinction -= static_cast<float>(gext);
-      std::cout << "Extinction!!!    " << g_extinction << std::endl;
+      //std::cout << "Extinction!!!    " << g_extinction << std::endl;
       break;
     }
 
@@ -269,15 +269,17 @@ int main() {
 
 
   //R between 1 and 100000, P between 0 and 1
-  std::vector<float> vecR = { 1.f, powf(10.f, 0.5f), 10.f, powf(10.f, 1.5f), 100.f, powf(10.f, 2.5f), 1000.f, powf(10.f, 3.5f), 10000.f, powf(10.f, 4.5f), 100000.f };
-  std::vector<float> vecP = { 0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f };
+  //std::vector<float> vecR = { 1.f, powf(10.f, 0.5f), 10.f, powf(10.f, 1.5f), 100.f, powf(10.f, 2.5f), 1000.f, powf(10.f, 3.5f), 10000.f, powf(10.f, 4.5f), 100000.f };
+  std::vector<float> vecR = { 1000.f, powf(10.f, 3.1f), powf(10.f, 3.2f), powf(10.f, 3.3f), powf(10.f, 3.4f), powf(10.f, 3.5f), 10000.f };
+  //std::vector<float> vecP = { 0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f };
+  std::vector<float> vecP = { 0.7f};
   //float R = 10.f;  //Environmental variation
   //float P = 1.f;   //predictability
   ///
 
 
 
-  const std::string outfile2 = "extinction_data.csv";
+  const std::string outfile2 = "extinction_data-selected.csv";
   std::ofstream ofs2(outfile2);
   ofs2 << "R,P,R_new,P_new,extinct,gen_extinct" << "\n";
 
@@ -323,7 +325,7 @@ int main() {
             simulation2(P_new, R_new, P, R, pop, extinction, g_extinction);
           }
           ofs2 << log10f(R) << "," << P << "," << log10f(R_new) << "," << P_new << "," << extinction / 10.f << "," << g_extinction / 10.f<< "\n";
-          std::cout << g_extinction << std::endl;
+          //std::cout << g_extinction << std::endl;
         }
 
       }
@@ -340,11 +342,3 @@ int main() {
 
   return 0;
 }
-
-
-
-
-
-
-
-
