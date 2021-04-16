@@ -269,17 +269,15 @@ int main() {
 
 
   //R between 1 and 100000, P between 0 and 1
-  //std::vector<float> vecR = { 1.f, powf(10.f, 0.5f), 10.f, powf(10.f, 1.5f), 100.f, powf(10.f, 2.5f), 1000.f, powf(10.f, 3.5f), 10000.f, powf(10.f, 4.5f), 100000.f };
-  std::vector<float> vecR = { 1000.f, powf(10.f, 3.1f), powf(10.f, 3.2f), powf(10.f, 3.3f), powf(10.f, 3.4f), powf(10.f, 3.5f), 10000.f };
-  //std::vector<float> vecP = { 0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f };
-  std::vector<float> vecP = { 0.7f};
+  std::vector<float> vecR = { 1.f, powf(10.f, 0.5f), 10.f, powf(10.f, 1.5f), 100.f, powf(10.f, 2.5f), 1000.f, powf(10.f, 3.5f), 10000.f, powf(10.f, 4.5f), 100000.f };
+  std::vector<float> vecP = { 0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f };
   //float R = 10.f;  //Environmental variation
   //float P = 1.f;   //predictability
   ///
 
 
 
-  const std::string outfile2 = "extinction_data-selected.csv";
+  const std::string outfile2 = "extinction_data.csv";
   std::ofstream ofs2(outfile2);
   ofs2 << "R,P,R_new,P_new,extinct,gen_extinct" << "\n";
 
