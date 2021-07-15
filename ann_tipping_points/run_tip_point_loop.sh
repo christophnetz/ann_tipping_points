@@ -11,4 +11,4 @@
 
 echo "P: "$1
 echo "R: "$2
-./mutational_switches -P $1 -R $2 
+./ann_tipping_points -P $1 -R $2 
