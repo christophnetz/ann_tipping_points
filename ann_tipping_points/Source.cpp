@@ -291,17 +291,21 @@ int main(int argc, char ** argv) {
 
     //R between 1 and 100000, P between 0 and 1
     std::vector<float> vecR = { 1.f,
-                                powf(10.f, 0.5f),
+                                3.16228f,
                                 10.f,
-                                powf(10.f, 1.5f),
+                                31.6228f,
                                 100.f,
-                                powf(10.f, 2.5f),
+                                316.228f,
                                 1000.f,
-                                powf(10.f, 3.5f),
+                                3162.28f,
                                 10000.f,
-                                powf(10.f, 4.5f),
+                                31622.8f,
                                 100000.f
                               };
+    for(const auto& number : vecR)
+    {
+        std::cout << number << std::endl;
+    }
     std::vector<float> vecP = { 0.0f,
                                 0.1f,
                                 0.2f,
@@ -318,74 +322,74 @@ int main(int argc, char ** argv) {
     float original_R = results["R"].as<float>();
     float P = results["P"].as<float>();
 
-            std::vector<Individual> pop(popsize); // population size: 5000
+    std::vector<Individual> pop(popsize); // population size: 5000
 
-            simulation1(pop, P, original_R);
+    simulation1(pop, P, original_R);
 
-            const std::string outfile = "data_logR" +
-                    std::to_string(log10f(original_R)).substr(0, 3) +
-                    "_P" +
-                    std::to_string(P).substr(0, 3) +
-                    ".txt";
+    const std::string outfile = "data_logR" +
+            std::to_string(log10f(original_R)).substr(0, 3) +
+            "_P" +
+            std::to_string(P).substr(0, 3) +
+            ".txt";
 
-            std::ofstream ofs(outfile);
-            ofs << "ind" << "\t" <<
-                   "h" << "\t" <<
-                   "I01" << "\t" <<
-                   "I02" << "\t" <<
-                   "b1" << "\t" <<
-                   "b2" << "\t" <<
-                   "s" << "\t" <<
-                   "a" << "\n";
+    std::ofstream ofs(outfile);
+    ofs << "ind" << "\t" <<
+           "h" << "\t" <<
+           "I01" << "\t" <<
+           "I02" << "\t" <<
+           "b1" << "\t" <<
+           "b2" << "\t" <<
+           "s" << "\t" <<
+           "a" << "\n";
 
-            for (int i = 0; i < static_cast<int>(pop.size()); ++i)
+    for (int i = 0; i < static_cast<int>(pop.size()); ++i)
+    {
+        ofs << i << "\t" <<
+               pop[i].h << "\t" <<
+               pop[i].I01 << "\t" <<
+               pop[i].I02 << "\t" <<
+               pop[i].b1 << "\t" <<
+               pop[i].b2 << "\t" <<
+               pop[i].s << "\t" <<
+               pop[i].a << "\n";
+    }
+    ofs.close();
+
+    ///////////////////////////////////////////////////////
+    ///Transition
+    //Questions: shift population just once/ a hundred times?
+    //What's this relative extinction rate?
+
+
+    const std::string outfile2 = "extinction_data_R" +
+            std::to_string(log10f(original_R)).substr(0, 3) +
+            "_P" +
+            std::to_string(P).substr(0, 3) +
+            ".csv";
+
+    std::ofstream ofs2(outfile2);
+    ofs2 << "R,P,R_new,P_new,extinct,gen_extinct" << "\n";
+
+    for (size_t r_new = 0; r_new < vecR.size(); ++r_new)
+    {
+        float R_new = vecR[r_new];
+        for (size_t p_new = 0; p_new < vecP.size(); ++p_new)
+        {
+            float P_new = vecP[p_new];
+            float extinction = 0.f;
+            float g_extinction = 0.f;
+            for (int sim2 = 0; sim2 < 1; sim2++)
             {
-                ofs << i << "\t" <<
-                       pop[i].h << "\t" <<
-                       pop[i].I01 << "\t" <<
-                       pop[i].I02 << "\t" <<
-                       pop[i].b1 << "\t" <<
-                       pop[i].b2 << "\t" <<
-                       pop[i].s << "\t" <<
-                       pop[i].a << "\n";
+                simulation2(P_new, R_new, original_R, pop, extinction, g_extinction);
             }
-            ofs.close();
-
-            ///////////////////////////////////////////////////////
-            ///Transition
-            //Questions: shift population just once/ a hundred times?
-            //What's this relative extinction rate?
-
-
-            const std::string outfile2 = "extinction_data_R" +
-                    std::to_string(log10f(original_R)).substr(0, 3) +
-                    "_P" +
-                    std::to_string(P).substr(0, 3) +
-                    ".csv";
-
-            std::ofstream ofs2(outfile2);
-            ofs2 << "R,P,R_new,P_new,extinct,gen_extinct" << "\n";
-
-            for (size_t r_new = 0; r_new < vecR.size(); ++r_new)
-            {
-                float R_new = vecR[r_new];
-                for (size_t p_new = 0; p_new < vecP.size(); ++p_new)
-                {
-                    float P_new = vecP[p_new];
-                    float extinction = 0.f;
-                    float g_extinction = 0.f;
-                    for (int sim2 = 0; sim2 < 1; sim2++)
-                    {
-                        simulation2(P_new, R_new, original_R, pop, extinction, g_extinction);
-                    }
-                    ofs2 << log10f(original_R) << "," <<
-                            P << "," << log10f(R_new) << "," <<
-                            P_new << "," << extinction / 10.f << "," <<
-                            g_extinction / 10.f<< "\n";
-                    //std::cout << g_extinction << std::endl;
-                }
-            }
-            ofs2.close();
+            ofs2 << log10f(original_R) << "," <<
+                    P << "," << log10f(R_new) << "," <<
+                    P_new << "," << extinction / 10.f << "," <<
+                    g_extinction / 10.f<< "\n";
+            //std::cout << g_extinction << std::endl;
+        }
+    }
+    ofs2.close();
 
     return 0;
 }

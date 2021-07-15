@@ -16,7 +16,7 @@ make clean
 qmake ann_tipping_points.pro
 make 
 
-P=(1 $((10**0.5)) 10 $((100**0.5)) 100 $((1000**0.5)) 1000 $((10000**0.5)) 10000 $((100000**0.5)) 100000)                             
+P=(1 3.16288 10 31.6288 100 316.288 1000 3162.88 10000 31628.8 100000)                             
 R= $(seq 0 0.1 1)
 for i in "${P[@]}"
 do
@@ -24,6 +24,6 @@ do
 do
   echo $i
   echo $j
-#  sbatch run_tip_point_loop.sh $i $j
+  sbatch run_tip_point_loop.sh $i $j
   done
 done 
