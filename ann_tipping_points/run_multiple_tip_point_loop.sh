@@ -17,7 +17,6 @@ qmake ann_tipping_points.pro
 make 
 
 P=(1 3.16288 10 31.6288 100 316.288 1000 3162.88 10000 31628.8 100000)                             
-R=()
 for i in "${P[@]}"
 do
   for j in $(seq 0 0.1 1)

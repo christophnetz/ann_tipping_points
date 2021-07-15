@@ -302,10 +302,7 @@ int main(int argc, char ** argv) {
                                 31622.8f,
                                 100000.f
                               };
-    for(const auto& number : vecR)
-    {
-        std::cout << number << std::endl;
-    }
+
     std::vector<float> vecP = { 0.0f,
                                 0.1f,
                                 0.2f,
