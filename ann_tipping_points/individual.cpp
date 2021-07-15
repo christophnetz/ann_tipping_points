@@ -11,9 +11,9 @@ Individual::Individual() {
   h_coin = true;
   I_realized = 0.f;
 
-  const auto& dist1 = std::uniform_real_distribution<float>(0.f, 1.f);
-  const auto& dist2 = std::uniform_real_distribution<float>(-1.f, 1.f);
-  const auto& dist3 = std::uniform_real_distribution<float>(-2.f, 2.f);
+  auto dist1 = std::uniform_real_distribution<float>(0.f, 1.f);
+  auto dist2 = std::uniform_real_distribution<float>(-1.f, 1.f);
+  auto dist3 = std::uniform_real_distribution<float>(-2.f, 2.f);
 
   s = dist1(rnd::reng);
 
@@ -90,7 +90,7 @@ float Individual::calculate_fitness(float kd, float ka, float tau) {
   else {
     fit = exp(-tau * mismatch);
   }
-  mismatch = 0.f;
+  mismatch = 0;
   n = 0;
 
   if (fit < 0.f)
