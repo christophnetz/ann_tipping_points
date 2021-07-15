@@ -14,5 +14,3 @@ HEADERS += \
     rnd.hpp \
     rndutils.hpp
 
-INCLUDEPATH += C:\Users\p288427\MinGW
-LIBS += "C:\Users\p288427\MinGW\lib\libboost_program_options.a"
