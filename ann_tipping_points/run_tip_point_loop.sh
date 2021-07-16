@@ -9,6 +9,6 @@
 #SBATCH --job-name=single_tip_sim
 #SBATCH --output=tip_%j.log
 
-echo "P: "$1
-echo "R: "$2
-./ann_tipping_points -P $1 -R $2 
+echo "R: "$1
+echo "P: "$2
+./ann_tipping_points -R $1 -P $2 
