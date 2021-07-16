@@ -194,6 +194,10 @@ void simulation1(std::vector<Individual>& pop, const float& P, const float& R) {
         }
 
         std::swap(pop, tmp_pop);
+        if(g % 1000 == 0)
+        {
+            std::cout<< "gen: " << g << std::endl;
+        }
     }
 
 
@@ -375,7 +379,7 @@ int main(int argc, char ** argv) {
             float P_new = vecP[p_new];
             float extinction = 0.f;
             float g_extinction = 0.f;
-            for (int sim2 = 0; sim2 < 1; sim2++)
+            for (int sim2 = 0; sim2 < 10; sim2++)
             {
                 simulation2(P_new, R_new, original_R, pop, extinction, g_extinction);
             }
