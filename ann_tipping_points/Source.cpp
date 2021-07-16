@@ -270,7 +270,7 @@ int main() {
 
   //R between 1 and 100000, P between 0 and 1
   std::vector<float> vecR = { 1.f, powf(10.f, 0.5f), 10.f, powf(10.f, 1.5f), 100.f, powf(10.f, 2.5f), 1000.f, powf(10.f, 3.5f), 10000.f, powf(10.f, 4.5f), 100000.f };
-  std::vector<float> vecP = { 0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f };
+  std::vector<float> vecP = { 1.0f };
   //float R = 10.f;  //Environmental variation
   //float P = 1.f;   //predictability
   ///
@@ -332,7 +332,7 @@ int main() {
 
 
     }
-
+    std::cout << "R right now: " << R << std::endl;
   }
 
   ofs2.close();
