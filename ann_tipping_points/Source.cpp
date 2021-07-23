@@ -33,42 +33,6 @@ const float A = 1.f;   //Deterministic scaling constant, default value
 const float B = 0.f;   //stochastic scaling constant, default value
 auto env_dist = std::uniform_real_distribution<float>(-1.f, 1.f); // not explicitly stated in botero 2015
 
-//
-//std::vector<Individual> reproduction(std::vector<Individual>& pop) {
-//
-//    //Calculate fitness
-//    std::vector<float> fitness;
-//    std::vector<Individual> tmp_pop;
-//
-//
-//    for (int i = 0; i < static_cast<int>(pop.size()); ++i) {
-//
-//        fitness.push_back(pop[i].calculate_fitness(kd, ka, tau));
-//
-//    }
-//
-//    float mean_fitness = accumulate(fitness.begin(), fitness.end(), 0.f) / static_cast<float>(fitness.size());
-//
-//    //std::cout << mean_fitness << std::endl;
-//
-//    //Reproduction
-//    for (int i = 0; i < static_cast<int>(pop.size()); ++i)
-//    {
-//        if (fitness[i] > 0.f)
-//        {
-//            int off = std::poisson_distribution<int>(fitness[i] / mean_fitness)(rnd::reng);
-//
-//            for (int j = 0; j < off; ++j)
-//            {
-//                tmp_pop.push_back(pop[i]);
-//            }
-//        }
-//    }
-//
-//    return tmp_pop;
-//}
-
-
 //for flexible pop size
 std::vector<Individual> free_reproduction(std::vector<Individual>& pop) {
 
@@ -104,22 +68,6 @@ std::vector<Individual> free_reproduction(std::vector<Individual>& pop) {
   }
   return tmp_pop;
 }
-
-//void adjust_popsize(std::vector<Individual>& tmp_pop, const size_t targetsize) {
-//
-//    while (tmp_pop.size() < targetsize) {
-//        int duplicate = std::uniform_int_distribution<int>(0, tmp_pop.size() - 1)(rnd::reng);
-//        tmp_pop.push_back(tmp_pop[duplicate]);
-//    }
-//
-//    if(tmp_pop.size() > targetsize)
-//    {
-//        //incorporated pop adjust
-//        std::shuffle(tmp_pop.begin(), tmp_pop.end(), rnd::reng);
-//        tmp_pop.resize(targetsize);
-//    }
-//
-//}
 
 void simulation1(std::vector<Individual>& pop, const float& P, const float& R) {
 
@@ -278,8 +226,12 @@ int main(int argc, char** argv) {
   cxxopts::Options options("",
     "Insert the parameters for the simualtion and see if you can get a mutational switch to evolve");
   options.add_options()
-    ("P,predictability", "the predictability of the environment", cxxopts::value<float>())
-    ("R,repeatability", "the repeatability of the environment", cxxopts::value<float>())
+          ("P,predictability", "the predictability of the environment", cxxopts::value<float>())
+          ("R,repeatability", "the repeatability of the environment", cxxopts::value<float>())
+          ("s, step_p", "the step at whihc to gnerate the vectpr of P values", cxxopts::value<float>())
+          ("S, step_r", "the step at whihc to gnerate the vectpr of R values", cxxopts::value<float>())
+          ("m, max_p", "the max value of P at which to test extinction", cxxopts::value<float>())
+          ("M, max_r", "the max value of R at which to test extinction", cxxopts::value<float>())
     ;
 
   auto results = options.parse(argc, argv);
@@ -288,33 +240,18 @@ int main(int argc, char** argv) {
   // A and B were varied between 0 and 1 (A+B = 1) to investigate deterministic vs stochastic env., not found to have a great effect
 
 
+//Create 2 very big arrays of R and P so you can always find the value of R and P given by the command line
+int size_par_vecs = 100;
+  std::vector<float> vecR(size_par_vecs);
+float start_R = 0.0;
+float step_R = results["step_r"].as<float>();
+std::generate(vecR.begin(),vecR.end(),[&](){return start_R = start_R + step_R;});
 
-  //R between 1 and 100000, P between 0 and 1
-  std::vector<float> vecR = { 1.f,
-                              3.16228f,
-                              10.f,
-                              31.6228f,
-                              100.f,
-                              316.228f,
-                              1000.f,
-                              3162.28f,
-                              10000.f,
-                              31622.8f,
-                              100000.f
-  };
-
-  std::vector<float> vecP = { 0.0f,
-                              0.1f,
-                              0.2f,
-                              0.3f,
-                              0.4f,
-                              0.5f,
-                              0.6f,
-                              0.7f,
-                              0.8f,
-                              0.9f,
-                              1.0f
-  };
+std::vector<float> vecP(size_par_vecs);
+float start_P = 0.0;
+float step_P = results["step_p"].as<float>();
+std::generate(vecP.begin(),vecP.end(),[&](){return start_P = start_P + step_P;});
+std::for_each(vecP.begin(),vecP.end(),[](float i){return std::pow(10,i);});
 
   float original_R = results["R"].as<float>();
   float P = results["P"].as<float>();
@@ -367,11 +304,10 @@ int main(int argc, char** argv) {
   std::ofstream ofs2(outfile2);
   ofs2 << "R,P,R_new,P_new,extinct,gen_extinct" << "\n";
 
-#pragma omp parallel for     
-  for (int r_new = 0; r_new < vecR.size(); ++r_new)
+  for (int r_new = 0; vecR[r_new] < results["max_r"].as<float>(); ++r_new)
   {
     float R_new = vecR[r_new];
-    for (int p_new = 0; p_new < vecP.size(); ++p_new)
+    for (int p_new = 0; vecP[r_new] < results["max_p"].as<float>(); ++p_new)
     {
       std::cout << "iterating extinction P" << std::endl;
       float P_new = vecP[p_new];
@@ -382,13 +318,11 @@ int main(int argc, char** argv) {
       {
         simulation2(P_new, R_new, original_R, pop, extinction, g_extinction);
       }
-#pragma omp critical
       {
         ofs2 << log10f(original_R) << "," <<
           P << "," << log10f(R_new) << "," <<
           P_new << "," << extinction / 10.f << "," <<
           g_extinction / 10.f << "\n";
-        //std::cout << g_extinction << std::endl;
       }
     }
     std::cout << "###iterating extinction R" << std::endl;
