@@ -11,4 +11,4 @@
 
 echo "R: "$1
 echo "P: "$2
-./ann_tipping_points -R $1 -P $2 
+./ann_tipping_points -R $1 -P $2 --step_r $3 --max_r $4 --step_p $5 --max_p $6
