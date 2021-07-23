@@ -16,10 +16,14 @@ make clean
 qmake ann_tipping_points.pro
 make 
 
-R=(1 3.16288 10 31.6288 100 316.288 1000 3162.88 10000 31628.8 100000)                             
-for i in "${R[@]}"
+
+Rmax=2.5
+Rstep=0.1
+Pmax=0.5
+Pstep=0.05                            
+for i in $(seq 0 $Rstep $Rmax)
 do
-  for j in $(seq 0 0.1 1)
+  for j in $(seq 0 $Pstep $Pmax)
 do
   echo $i
   echo $j

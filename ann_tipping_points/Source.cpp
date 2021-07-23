@@ -307,7 +307,7 @@ std::for_each(vecP.begin(),vecP.end(),[](float i){return std::pow(10,i);});
   for (int r_new = 0; vecR[r_new] < results["max_r"].as<float>(); ++r_new)
   {
     float R_new = vecR[r_new];
-    for (int p_new = 0; vecP[r_new] < results["max_p"].as<float>(); ++p_new)
+    for (int p_new = 0; vecP[r_new] < std::pow(10, results["max_p"].as<float>()); ++p_new)
     {
       std::cout << "iterating extinction P" << std::endl;
       float P_new = vecP[p_new];
