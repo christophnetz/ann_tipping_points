@@ -246,12 +246,12 @@ int size_par_vecs = 100;
 float start_R = 0.0;
 float step_R = results["step_r"].as<float>();
 std::generate(vecR.begin(),vecR.end(),[&](){return start_R = start_R + step_R;});
+std::for_each(vecR.begin(),vecR.end(),[](float i){return std::pow(10,i);});
 
 std::vector<float> vecP(size_par_vecs);
 float start_P = 0.0;
 float step_P = results["step_p"].as<float>();
 std::generate(vecP.begin(),vecP.end(),[&](){return start_P = start_P + step_P;});
-std::for_each(vecP.begin(),vecP.end(),[](float i){return std::pow(10,i);});
 
   float original_R = results["R"].as<float>();
   float P = results["P"].as<float>();
@@ -304,10 +304,11 @@ std::for_each(vecP.begin(),vecP.end(),[](float i){return std::pow(10,i);});
   std::ofstream ofs2(outfile2);
   ofs2 << "R,P,R_new,P_new,extinct,gen_extinct" << "\n";
 
-  for (int r_new = 0; vecR[r_new] < results["max_r"].as<float>(); ++r_new)
+  for (int r_new = 0; vecR[r_new] < std::pow(10, results["max_r"].as<float>()); ++r_new)
   {
     float R_new = vecR[r_new];
-    for (int p_new = 0; vecP[r_new] < std::pow(10, results["max_p"].as<float>()); ++p_new)
+
+    for (int p_new = 0; vecP[r_new] < results["max_p"].as<float>(); ++p_new)
     {
       std::cout << "iterating extinction P" << std::endl;
       float P_new = vecP[p_new];

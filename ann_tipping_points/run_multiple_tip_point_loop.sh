@@ -27,6 +27,6 @@ do
 do
   echo $i
   echo $j
-  sbatch run_tip_point_loop.sh $i $j
+  sbatch run_tip_point_loop.sh $i $j $Rstep $Rmax $Pstep $Pmax
   done
 done 
