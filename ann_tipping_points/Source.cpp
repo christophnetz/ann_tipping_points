@@ -253,7 +253,7 @@ int main(int argc, char** argv) {
     float step_P = results["step_p"].as<float>();
     std::generate(vecP.begin(),vecP.end(),[&](){return start_P = start_P + step_P;});
 
-    float original_R = results["R"].as<float>();
+    float original_R = std::pow(10, results["R"].as<float>());
     float P = results["P"].as<float>();
 
     std::vector<Individual> pop(popsize); // population size: 5000
